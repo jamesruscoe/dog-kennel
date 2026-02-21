@@ -29,21 +29,16 @@ const submit = () => {
     <GuestLayout>
         <Head title="Forgot Password" />
 
-        <!-- Header with Logo -->
         <div class="mb-6 text-center">
-            <span class="text-xl font-bold text-black">
-                Laravel Blueprint
-            </span>
-            <h2 class="mt-2 text-xl font-semibold text-gray-900">Password Recovery</h2>
-        </div>
-
-        <div class="mb-6 text-sm text-gray-600">
-            Forgot your password? No problem. Enter your email address and we'll send you a password reset link.
+            <h2 class="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Forgot your password?</h2>
+            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                Enter your email and we'll send you a reset link.
+            </p>
         </div>
 
         <div
             v-if="status"
-            class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md text-sm font-medium text-green-800"
+            class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900/20 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-400"
         >
             {{ status }}
         </div>
@@ -51,7 +46,6 @@ const submit = () => {
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="email" value="Email" />
-
                 <TextInput
                     id="email"
                     type="email"
@@ -62,7 +56,6 @@ const submit = () => {
                     autocomplete="username"
                     placeholder="Enter your email address"
                 />
-
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
@@ -72,16 +65,16 @@ const submit = () => {
                     :class="{ 'opacity-70': form.processing }"
                     :disabled="form.processing"
                 >
-                    {{ form.processing ? 'Sending...' : 'Send Password Reset Link' }}
+                    {{ form.processing ? 'Sending...' : 'Send reset link' }}
                 </PrimaryButton>
             </div>
 
             <div class="mt-4 text-center">
                 <Link
                     :href="route('login')"
-                    class="text-sm text-gray-600 hover:text-black transition-colors"
+                    class="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                 >
-                    Return to login
+                    Back to sign in
                 </Link>
             </div>
         </form>

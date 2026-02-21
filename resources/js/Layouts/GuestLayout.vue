@@ -1,26 +1,20 @@
 <script setup>
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import { Link } from '@inertiajs/vue3';
 </script>
 
 <template>
-    <div
-        class="flex min-h-screen flex-col items-center bg-gray-50 pt-6 sm:justify-center sm:pt-0"
-    >
-        <div>
-            <Link href="/">
-                <ApplicationLogo class="h-20 w-30 fill-current text-black" />
-            </Link>
-        </div>
+    <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center px-4 py-12">
+        <!-- Brand -->
+        <Link href="/" class="flex items-center gap-2 mb-8">
+            <svg class="h-8 w-8 text-indigo-600" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4.5 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm15 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM7 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm10 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM12 22c-4 0-7.5-2.8-7.5-7 0-2.5 1.2-4.5 3-5.8C8.8 8.2 10.3 8 12 8s3.2.2 4.5 1.2c1.8 1.3 3 3.3 3 5.8 0 4.2-3.5 7-7.5 7Z"/>
+            </svg>
+            <span class="text-xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">PawStay</span>
+        </Link>
 
-        <div
-            class="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-sm border border-gray-200 sm:max-w-md sm:rounded-lg"
-        >
+        <!-- Card -->
+        <div class="w-full max-w-md rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-8 py-8 shadow-sm">
             <slot />
         </div>
     </div>
 </template>
-
-<style scoped>
-/* Any additional custom styles */
-</style>

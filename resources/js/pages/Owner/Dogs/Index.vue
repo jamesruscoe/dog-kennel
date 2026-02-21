@@ -9,6 +9,27 @@ defineOptions({ layout: KennelLayout });
 defineProps<{
     dogs: Dog[];
 }>();
+
+function formatAge(dog: Dog): string | null {
+    if (dog.date_of_birth) {
+        const dob = new Date(dog.date_of_birth);
+        const now = new Date();
+        let years = now.getFullYear() - dob.getFullYear();
+        let months = now.getMonth() - dob.getMonth();
+        if (months < 0) { years--; months += 12; }
+        if (years === 0) return `${months}mo`;
+        if (months === 0) return `${years}yr`;
+        return `${years}yr ${months}mo`;
+    }
+    if (dog.age_years != null) {
+        const years = Math.floor(dog.age_years);
+        const months = Math.round((dog.age_years % 1) * 12);
+        if (years === 0) return `${months}mo`;
+        if (months === 0) return `${years}yr`;
+        return `${years}yr ${months}mo`;
+    }
+    return null;
+}
 </script>
 
 <template>
@@ -43,8 +64,8 @@ defineProps<{
                 <span class="text-2xl">{{ dog.sex === 'male' ? '♂' : '♀' }}</span>
             </div>
             <div class="mt-3 flex flex-wrap gap-2">
-                <span v-if="dog.age_years" class="inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 text-xs text-zinc-600 dark:text-zinc-400">
-                    {{ dog.age_years }}yr
+                <span v-if="formatAge(dog)" class="inline-flex items-center rounded-full bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 text-xs text-zinc-600 dark:text-zinc-400">
+                    {{ formatAge(dog) }}
                 </span>
                 <span v-if="dog.neutered" class="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-900/20 px-2.5 py-0.5 text-xs text-blue-600 dark:text-blue-400">
                     Neutered
