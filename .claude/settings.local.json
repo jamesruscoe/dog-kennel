@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(php -l:*)",
+      "Bash(while read f)",
+      "Bash(do php -l:*)",
+      "Bash(done)",
+      "Bash(php artisan migrate:*)",
+      "Bash(php artisan db:seed:*)",
+      "Bash(php artisan:*)",
+      "Bash(npm run build:*)",
+      "Bash(node:*)",
+      "Bash(composer require:*)"
+    ]
+  }
+}

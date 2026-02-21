@@ -7,16 +7,8 @@ use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
-    /**
-     * The root template that is loaded on the first page visit.
-     *
-     * @var string
-     */
     protected $rootView = 'app';
 
-    /**
-     * Determine the current asset version.
-     */
     public function version(Request $request): ?string
     {
         return parent::version($request);
@@ -24,16 +16,31 @@ class HandleInertiaRequests extends Middleware
 
     /**
      * Define the props that are shared by default.
+     * These are available on every Inertia page via usePage().props.
      *
      * @return array<string, mixed>
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user ? [
+                    'id'    => $user->id,
+                    'name'  => $user->name,
+                    'email' => $user->email,
+                    'role'  => $user->role?->value,
+                ] : null,
             ],
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error'   => $request->session()->get('error'),
+            ],
+            'unread_notifications_count' => $user
+                ? $user->unreadNotifications()->count()
+                : 0,
             'csrf_token' => csrf_token(),
         ];
     }
