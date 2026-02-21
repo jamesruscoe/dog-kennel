@@ -5,7 +5,7 @@ import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
 
 defineProps({
@@ -16,8 +16,6 @@ defineProps({
         type: String,
     },
 });
-
-const page = usePage();
 
 const form = useForm({
     email: '',
@@ -36,23 +34,18 @@ const submit = () => {
     <GuestLayout>
         <Head title="Log in" />
 
-        <!-- Header with Logo -->
-        <div class="mb-8 text-center">
-            <span class="text-xl font-bold text-black">
-                Laravel Blueprint
-            </span>
-            <h2 class="mt-2 text-2xl font-semibold text-gray-900">Welcome Back</h2>
-            <p class="text-sm text-gray-600">Sign in to your account to continue</p>
+        <div class="mb-6 text-center">
+            <h2 class="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Welcome back</h2>
+            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Sign in to your account to continue</p>
         </div>
 
-        <div v-if="status" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md text-sm font-medium text-green-800">
+        <div v-if="status" class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900/20 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-400">
             {{ status }}
         </div>
 
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="email" value="Email" />
-
                 <TextInput
                     id="email"
                     type="email"
@@ -63,13 +56,11 @@ const submit = () => {
                     autocomplete="username"
                     placeholder="Enter your email address"
                 />
-
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">
                 <InputLabel for="password" value="Password" />
-
                 <TextInput
                     id="password"
                     type="password"
@@ -79,15 +70,22 @@ const submit = () => {
                     autocomplete="current-password"
                     placeholder="Enter your password"
                 />
-
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
-            <div class="mt-4 block">
-                <label class="flex items-center">
+            <div class="mt-4 flex items-center justify-between">
+                <label class="flex items-center gap-2">
                     <Checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ms-2 text-sm text-gray-600">Remember me</span>
+                    <span class="text-sm text-zinc-600 dark:text-zinc-400">Remember me</span>
                 </label>
+
+                <Link
+                    v-if="canResetPassword"
+                    :href="route('password.request')"
+                    class="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
+                >
+                    Forgot password?
+                </Link>
             </div>
 
             <div class="mt-6">
@@ -96,27 +94,19 @@ const submit = () => {
                     :class="{ 'opacity-70': form.processing }"
                     :disabled="form.processing"
                 >
-                    {{ form.processing ? 'Logging in...' : 'Log in' }}
+                    {{ form.processing ? 'Signing in...' : 'Sign in' }}
                 </PrimaryButton>
             </div>
 
-            <div class="mt-4 flex items-center justify-between">
-                <Link
-                    v-if="canResetPassword"
-                    :href="route('password.request')"
-                    class="text-sm text-gray-600 hover:text-black transition-colors"
-                >
-                    Forgot your password?
-                </Link>
-
+            <div class="mt-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                Don't have an account?
                 <Link
                     :href="route('register')"
-                    class="text-sm text-gray-600 hover:text-black transition-colors"
+                    class="font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                 >
-                    Don't have an account?
+                    Create one
                 </Link>
             </div>
         </form>
     </GuestLayout>
 </template>
-

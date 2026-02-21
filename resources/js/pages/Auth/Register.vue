@@ -28,19 +28,14 @@ const submit = () => {
     <GuestLayout>
         <Head title="Register" />
 
-        <!-- Header with Logo -->
-        <div class="mb-8 text-center">
-            <span class="text-xl font-bold text-black">
-                Laravel Blueprint
-            </span>
-            <h2 class="mt-2 text-2xl font-semibold text-gray-900">Create Account</h2>
-            <p class="text-sm text-gray-600">Sign up to get started</p>
+        <div class="mb-6 text-center">
+            <h2 class="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Create an account</h2>
+            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Sign up to get started with PawStay</p>
         </div>
 
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="name" value="Name" />
-
                 <TextInput
                     id="name"
                     type="text"
@@ -51,13 +46,11 @@ const submit = () => {
                     autocomplete="name"
                     placeholder="Enter your full name"
                 />
-
                 <InputError class="mt-2" :message="form.errors.name" />
             </div>
 
             <div class="mt-4">
                 <InputLabel for="email" value="Email" />
-
                 <TextInput
                     id="email"
                     type="email"
@@ -67,13 +60,11 @@ const submit = () => {
                     autocomplete="username"
                     placeholder="Enter your email address"
                 />
-
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
             <div class="mt-4">
                 <InputLabel for="password" value="Password" />
-
                 <TextInput
                     id="password"
                     type="password"
@@ -83,13 +74,11 @@ const submit = () => {
                     autocomplete="new-password"
                     placeholder="Create a password"
                 />
-
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
 
             <div class="mt-4">
                 <InputLabel for="password_confirmation" value="Confirm Password" />
-
                 <TextInput
                     id="password_confirmation"
                     type="password"
@@ -99,7 +88,6 @@ const submit = () => {
                     autocomplete="new-password"
                     placeholder="Confirm your password"
                 />
-
                 <InputError class="mt-2" :message="form.errors.password_confirmation" />
             </div>
 
@@ -109,16 +97,17 @@ const submit = () => {
                     :class="{ 'opacity-70': form.processing }"
                     :disabled="form.processing"
                 >
-                    {{ form.processing ? 'Creating account...' : 'Register' }}
+                    {{ form.processing ? 'Creating account...' : 'Create account' }}
                 </PrimaryButton>
             </div>
 
-            <div class="mt-4 text-center">
+            <div class="mt-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                Already have an account?
                 <Link
                     :href="route('login')"
-                    class="text-sm text-gray-600 hover:text-black transition-colors"
+                    class="font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                 >
-                    Already have an account? Sign in
+                    Sign in
                 </Link>
             </div>
         </form>
