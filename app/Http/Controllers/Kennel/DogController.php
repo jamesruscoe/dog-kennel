@@ -65,7 +65,7 @@ class DogController extends Controller
         $dog   = $this->dogService->create($owner, $data);
 
         return redirect()
-            ->route('staff.dogs.show', $dog)
+            ->route('staff.dogs.show', ['company' => app(\App\Models\CompanyContext::class)->slug, 'dog' => $dog])
             ->with('success', "{$dog->name} has been added.");
     }
 
@@ -84,7 +84,7 @@ class DogController extends Controller
         $this->dogService->update($dog, $request->validated());
 
         return redirect()
-            ->route('staff.dogs.show', $dog)
+            ->route('staff.dogs.show', ['company' => app(\App\Models\CompanyContext::class)->slug, 'dog' => $dog])
             ->with('success', "{$dog->name} updated successfully.");
     }
 
@@ -97,7 +97,7 @@ class DogController extends Controller
         }
 
         return redirect()
-            ->route('staff.dogs.index')
+            ->route('staff.dogs.index', ['company' => app(\App\Models\CompanyContext::class)->slug])
             ->with('success', 'Dog removed.');
     }
 }

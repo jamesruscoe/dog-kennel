@@ -55,7 +55,7 @@ class OwnerController extends Controller
         $owner = $this->ownerService->create($request->validated());
 
         return redirect()
-            ->route('staff.owners.show', $owner)
+            ->route('staff.owners.show', ['company' => app(\App\Models\CompanyContext::class)->slug, 'owner' => $owner])
             ->with('success', "{$request->name} has been added as an owner.");
     }
 
@@ -73,7 +73,7 @@ class OwnerController extends Controller
         $this->ownerService->update($owner, $request->validated());
 
         return redirect()
-            ->route('staff.owners.show', $owner)
+            ->route('staff.owners.show', ['company' => app(\App\Models\CompanyContext::class)->slug, 'owner' => $owner])
             ->with('success', 'Owner updated successfully.');
     }
 
@@ -86,7 +86,7 @@ class OwnerController extends Controller
         }
 
         return redirect()
-            ->route('staff.owners.index')
+            ->route('staff.owners.index', ['company' => app(\App\Models\CompanyContext::class)->slug])
             ->with('success', 'Owner removed.');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\UserRole;
+use App\Models\CompanyContext;
 use App\Models\Owner;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -48,7 +49,11 @@ class OwnerService
     public function create(array $data): Owner
     {
         return DB::transaction(function () use ($data) {
+            // User does not use BelongsToCompany, so company_id must be stamped here.
             $user = User::create([
+                'company_id'        => app()->bound(CompanyContext::class)
+                    ? app(CompanyContext::class)->id
+                    : null,
                 'name'              => $data['name'],
                 'email'             => $data['email'],
                 'password'          => bcrypt($data['password'] ?? str()->random(16)),

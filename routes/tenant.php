@@ -23,11 +23,17 @@ use App\Http\Controllers\Staff\StaffUserController;
 use App\Http\Controllers\Tenant\TenantWelcomeController;
 use App\Http\Middleware\EnsureAdminOrSuperAdmin;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TENANT ROOT  —  /{company}/  → company landing page
 // ─────────────────────────────────────────────────────────────────────────────
 Route::get('/', TenantWelcomeController::class)->name('tenant.home');
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TENANT PORTAL  —  /{company}/portal  → sign in / register choice
+// ─────────────────────────────────────────────────────────────────────────────
+Route::get('/portal', fn () => Inertia::render('Tenant/Portal'))->name('tenant.portal');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TENANT AUTH  —  /{company}/login, /forgot-password, /reset-password

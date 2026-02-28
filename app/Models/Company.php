@@ -30,6 +30,15 @@ class Company extends Model
         ];
     }
 
+    /**
+     * The route uses the company slug in the URL, not the numeric primary key.
+     * This lets Laravel resolve {company} route parameters by slug implicitly.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
     // -------------------------------------------------------------------------
     // Relationships
     // -------------------------------------------------------------------------

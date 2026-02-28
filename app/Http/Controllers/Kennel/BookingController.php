@@ -63,7 +63,7 @@ class BookingController extends Controller
         }
 
         return redirect()
-            ->route('staff.bookings.show', $booking)
+            ->route('staff.bookings.show', ['company' => app(\App\Models\CompanyContext::class)->slug, 'booking' => $booking])
             ->with('success', 'Booking created and pending approval.');
     }
 

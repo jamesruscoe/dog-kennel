@@ -17,12 +17,6 @@ import { Head, Link } from '@inertiajs/vue3';
             </div>
             <div class="flex items-center gap-3">
                 <Link
-                    :href="route('login')"
-                    class="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
-                >
-                    Admin sign in
-                </Link>
-                <Link
                     :href="route('signup')"
                     class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
                 >
@@ -55,12 +49,6 @@ import { Head, Link } from '@inertiajs/vue3';
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
-                </Link>
-                <Link
-                    :href="route('login')"
-                    class="inline-flex items-center gap-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-6 py-3 text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-800 shadow-sm transition-colors"
-                >
-                    Platform admin
                 </Link>
             </div>
         </main>

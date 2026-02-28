@@ -28,6 +28,12 @@ class ResolveCompanyFromPath
         // Bind into DI container so BelongsToCompany global scope can read it
         app()->instance(CompanyContext::class, $company);
 
+        // Remove {company} from route parameters so Laravel's controller
+        // dependency injector does not insert the slug string into positional
+        // argument slots before Eloquent-bound parameters (e.g. {dog}).
+        // The company slug is accessible anywhere via app(CompanyContext::class)->slug.
+        $request->route()->forgetParameter('company');
+
         // Share with all Inertia pages
         Inertia::share('company', [
             'id'           => $company->id,

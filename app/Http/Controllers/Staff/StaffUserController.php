@@ -53,7 +53,7 @@ class StaffUserController extends Controller
         ]);
 
         return redirect()
-            ->route('staff.users.index')
+            ->route('staff.users.index', ['company' => app(\App\Models\CompanyContext::class)->slug])
             ->with('success', 'Staff account created successfully.');
     }
 
@@ -74,7 +74,7 @@ class StaffUserController extends Controller
         $user->delete();
 
         return redirect()
-            ->route('staff.users.index')
+            ->route('staff.users.index', ['company' => app(\App\Models\CompanyContext::class)->slug])
             ->with('success', 'Staff account removed.');
     }
 }

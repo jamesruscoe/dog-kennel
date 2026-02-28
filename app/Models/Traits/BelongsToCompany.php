@@ -24,6 +24,14 @@ trait BelongsToCompany
                 $builder->where("{$table}.company_id", app(CompanyContext::class)->id);
             }
         });
+
+        // Automatically stamp company_id on every new record when inside a
+        // tenant request, so callers never need to pass it explicitly.
+        static::creating(function ($model) {
+            if (empty($model->company_id) && app()->bound(CompanyContext::class)) {
+                $model->company_id = app(CompanyContext::class)->id;
+            }
+        });
     }
 
     public function company(): BelongsTo

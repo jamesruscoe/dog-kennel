@@ -72,7 +72,7 @@ class OwnerBookingController extends Controller
         $booking = $this->bookingService->create($dog, $request->validated());
 
         return redirect()
-            ->route('owner.bookings.show', $booking)
+            ->route('owner.bookings.show', ['company' => app(\App\Models\CompanyContext::class)->slug, 'booking' => $booking])
             ->with('success', 'Booking request submitted. We will confirm shortly.');
     }
 
