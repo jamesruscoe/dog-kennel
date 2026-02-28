@@ -1,21 +1,33 @@
-<script setup>
+<script setup lang="ts">
 import Checkbox from '@/Components/Checkbox.vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import type { SharedProps } from '@/types/kennel';
 
-defineProps({
-    canResetPassword: {
-        type: Boolean,
-    },
-    status: {
-        type: String,
-    },
-});
+defineProps<{
+    canResetPassword?: boolean;
+    status?: string;
+}>();
+
+const page = usePage<SharedProps>();
+const company = computed(() => page.props.company);
+
+// Use tenant routes when inside a company context, root routes otherwise
+const loginRoute = computed(() =>
+    company.value
+        ? route('tenant.login', { company: company.value.slug })
+        : route('login')
+);
+const forgotRoute = computed(() =>
+    company.value
+        ? route('tenant.password.request', { company: company.value.slug })
+        : route('password.request')
+);
 
 const form = useForm({
     email: '',
@@ -24,7 +36,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('login'), {
+    form.post(loginRoute.value, {
         onFinish: () => form.reset('password'),
     });
 };
@@ -81,7 +93,7 @@ const submit = () => {
 
                 <Link
                     v-if="canResetPassword"
-                    :href="route('password.request')"
+                    :href="forgotRoute"
                     class="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                 >
                     Forgot password?
@@ -96,16 +108,6 @@ const submit = () => {
                 >
                     {{ form.processing ? 'Signing in...' : 'Sign in' }}
                 </PrimaryButton>
-            </div>
-
-            <div class="mt-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
-                Don't have an account?
-                <Link
-                    :href="route('register')"
-                    class="font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
-                >
-                    Create one
-                </Link>
             </div>
         </form>
     </GuestLayout>

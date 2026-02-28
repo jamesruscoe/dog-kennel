@@ -5,8 +5,11 @@ import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import DogForm from '@/Components/Kennel/DogForm.vue';
 import type { DogFormData } from '@/Components/Kennel/DogForm.vue';
 import type { Owner } from '@/types/kennel';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const props = defineProps<{
     owners: Owner[];
@@ -32,7 +35,7 @@ const form = useForm<DogFormData>({
 });
 
 function submit() {
-    form.post(route('staff.dogs.store'));
+    form.post(tenantRoute('staff.dogs.store'));
 }
 </script>
 
@@ -42,7 +45,7 @@ function submit() {
     <PageHeader
         title="Add Dog"
         :breadcrumbs="[
-            { label: 'Dogs', href: route('staff.dogs.index') },
+            { label: 'Dogs', href: tenantRoute('staff.dogs.index') },
             { label: 'New Dog' },
         ]"
     />
@@ -51,7 +54,7 @@ function submit() {
         <DogForm :form="form" :owners="owners" @submit="submit">
             <template #cancel>
                 <Link
-                    :href="selectedOwner ? route('staff.owners.show', selectedOwner.id) : route('staff.dogs.index')"
+                    :href="selectedOwner ? tenantRoute('staff.owners.show', selectedOwner.id) : tenantRoute('staff.dogs.index')"
                     class="rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 transition-colors"
                 >
                     Cancel

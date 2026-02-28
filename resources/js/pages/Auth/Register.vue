@@ -1,16 +1,29 @@
-<script setup>
+<script setup lang="ts">
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
+import { computed } from 'vue';
+import type { SharedProps } from '@/types/kennel';
 
-const page = usePage();
+const page = usePage<SharedProps>();
+const company = computed(() => page.props.company);
+
+const registerRoute = computed(() =>
+    company.value
+        ? route('tenant.register', { company: company.value.slug })
+        : route('register')
+);
+
+const loginRoute = computed(() =>
+    company.value
+        ? route('tenant.login', { company: company.value.slug })
+        : route('login')
+);
 
 const form = useForm({
-    _token: page.props.csrf_token,
     name: '',
     email: '',
     password: '',
@@ -18,7 +31,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('register'), {
+    form.post(registerRoute.value, {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
 };
@@ -30,7 +43,9 @@ const submit = () => {
 
         <div class="mb-6 text-center">
             <h2 class="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Create an account</h2>
-            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Sign up to get started with PawStay</p>
+            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                {{ company ? `Sign up to use ${company.name}` : 'Sign up to get started' }}
+            </p>
         </div>
 
         <form @submit.prevent="submit">
@@ -104,7 +119,7 @@ const submit = () => {
             <div class="mt-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
                 Already have an account?
                 <Link
-                    :href="route('login')"
+                    :href="loginRoute"
                     class="font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                 >
                     Sign in

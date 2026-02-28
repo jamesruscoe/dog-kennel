@@ -4,8 +4,11 @@ import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import StatusBadge from '@/Components/Kennel/StatusBadge.vue';
 import EmptyState from '@/Components/Kennel/EmptyState.vue';
 import type { Booking, Dog } from '@/types/kennel';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 defineProps<{
     dog: Dog;
@@ -19,17 +22,17 @@ defineProps<{
     <PageHeader
         :title="dog.name"
         :subtitle="dog.breed"
-        :breadcrumbs="[{ label: 'My Dogs', href: route('owner.dogs.index') }, { label: dog.name }]"
+        :breadcrumbs="[{ label: 'My Dogs', href: tenantRoute('owner.dogs.index') }, { label: dog.name }]"
     >
         <template #actions>
             <Link
-                :href="route('owner.dogs.edit', dog.id)"
+                :href="tenantRoute('owner.dogs.edit', dog.id)"
                 class="inline-flex items-center gap-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
             >
                 Edit Details
             </Link>
             <Link
-                :href="route('owner.bookings.create', { dog_id: dog.id })"
+                :href="tenantRoute('owner.bookings.create', { dog_id: dog.id })"
                 class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
             >
                 Book a Stay
@@ -114,7 +117,7 @@ defineProps<{
                 <ul v-if="bookings.length > 0" class="divide-y divide-zinc-100 dark:divide-zinc-800">
                     <li v-for="booking in bookings" :key="booking.id" class="px-6 py-3 flex items-center justify-between">
                         <div>
-                            <Link :href="route('owner.bookings.show', booking.id)" class="text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:text-indigo-600">
+                            <Link :href="tenantRoute('owner.bookings.show', booking.id)" class="text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:text-indigo-600">
                                 {{ new Date(booking.check_in_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}
                                 –
                                 {{ new Date(booking.check_out_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}

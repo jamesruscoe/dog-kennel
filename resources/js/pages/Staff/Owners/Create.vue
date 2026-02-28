@@ -4,8 +4,11 @@ import KennelLayout from '@/Layouts/KennelLayout.vue';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import OwnerForm from '@/Components/Kennel/OwnerForm.vue';
 import type { OwnerFormData } from '@/Components/Kennel/OwnerForm.vue';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const form = useForm<OwnerFormData>({
     name: '',
@@ -18,7 +21,7 @@ const form = useForm<OwnerFormData>({
 });
 
 function submit() {
-    form.post(route('staff.owners.store'));
+    form.post(tenantRoute('staff.owners.store'));
 }
 </script>
 
@@ -27,14 +30,14 @@ function submit() {
 
     <PageHeader
         title="Add Owner"
-        :breadcrumbs="[{ label: 'Owners', href: route('staff.owners.index') }, { label: 'New Owner' }]"
+        :breadcrumbs="[{ label: 'Owners', href: tenantRoute('staff.owners.index') }, { label: 'New Owner' }]"
     />
 
     <div class="max-w-2xl">
         <OwnerForm :form="form" @submit="submit">
             <template #cancel>
                 <Link
-                    :href="route('staff.owners.index')"
+                    :href="tenantRoute('staff.owners.index')"
                     class="rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 transition-colors"
                 >
                     Cancel

@@ -66,8 +66,6 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        // Route to the owner portal; the `/dashboard` redirect would also work
-        // but skipping one hop gives a faster first-load experience.
-        return redirect()->route('owner.dashboard');
+        return redirect()->route('home');
     }
 }

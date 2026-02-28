@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Company;
 use App\Models\Dog;
 use App\Models\Owner;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -36,6 +37,7 @@ class DogFactory extends Factory
         $sex = fake()->randomElement(['male', 'female']);
 
         return [
+            'company_id'            => Company::factory(),
             'owner_id'              => Owner::factory(),
             'name'                  => fake()->randomElement(self::$dogNames),
             'breed'                 => fake()->randomElement(self::$breeds),
@@ -62,5 +64,10 @@ class DogFactory extends Factory
     public function unvaccinated(): static
     {
         return $this->state(['vaccination_confirmed' => false]);
+    }
+
+    public function forCompany(Company $company): static
+    {
+        return $this->state(['company_id' => $company->id]);
     }
 }

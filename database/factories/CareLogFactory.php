@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Booking;
 use App\Models\CareLog;
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -39,6 +40,7 @@ class CareLogFactory extends Factory
         $notes = fake()->randomElement(self::$notesByActivity[$activityType] ?? ['No additional notes.']);
 
         return [
+            'company_id'    => Company::factory(),
             'booking_id'    => Booking::factory(),
             'logged_by'     => User::factory()->staff(),
             'activity_type' => $activityType,
@@ -60,5 +62,10 @@ class CareLogFactory extends Factory
     public function forToday(): static
     {
         return $this->state(['occurred_at' => now()->subHours(fake()->numberBetween(1, 8))]);
+    }
+
+    public function forCompany(Company $company): static
+    {
+        return $this->state(['company_id' => $company->id]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\BelongsToCompany;
 use Database\Factories\OwnerFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,12 +15,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Owner extends Model
 {
     /** @use HasFactory<OwnerFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToCompany;
 
     /**
      * @var list<string>
      */
     protected $fillable = [
+        'company_id',
         'user_id',
         'phone',
         'address',

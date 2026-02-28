@@ -9,8 +9,11 @@ import StatusBadge from '@/Components/Kennel/StatusBadge.vue';
 import ConfirmModal from '@/Components/Kennel/ConfirmModal.vue';
 import EmptyState from '@/Components/Kennel/EmptyState.vue';
 import type { Booking } from '@/types/kennel';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const props = defineProps<{
     booking: Booking;
@@ -25,7 +28,7 @@ const cancelModal = ref<InstanceType<typeof ConfirmModal>>();
 const cancelForm = useForm({ cancellation_reason: '' });
 
 function submitCancel() {
-    cancelForm.patch(route('owner.bookings.cancel', props.booking.id), {
+    cancelForm.patch(tenantRoute('owner.bookings.cancel', props.booking.id), {
         onSuccess: () => cancelModal.value?.hide(),
     });
 }
@@ -85,7 +88,7 @@ async function openPaymentPanel() {
 
     try {
         const { data } = await axios.post(
-            route('owner.bookings.payment.intent', props.booking.id),
+            tenantRoute('owner.bookings.payment.intent', props.booking.id),
         );
 
         paymentPanel.value = true;
@@ -114,7 +117,7 @@ async function confirmPayment() {
     const { error } = await stripeInstance.confirmPayment({
         elements: elementsInstance,
         confirmParams: {
-            return_url: route('owner.bookings.show', props.booking.id),
+            return_url: tenantRoute('owner.bookings.show', props.booking.id),
         },
     });
 
@@ -131,7 +134,7 @@ async function confirmPayment() {
 
     <PageHeader
         :title="`Booking #${booking.id}`"
-        :breadcrumbs="[{ label: 'My Bookings', href: route('owner.bookings.index') }, { label: `#${booking.id}` }]"
+        :breadcrumbs="[{ label: 'My Bookings', href: tenantRoute('owner.bookings.index') }, { label: `#${booking.id}` }]"
     >
         <template #actions>
             <ConfirmModal

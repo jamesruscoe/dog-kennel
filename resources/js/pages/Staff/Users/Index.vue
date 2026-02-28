@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import KennelLayout from '@/Layouts/KennelLayout.vue';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import ConfirmModal from '@/Components/Kennel/ConfirmModal.vue';
 import EmptyState from '@/Components/Kennel/EmptyState.vue';
@@ -19,6 +20,7 @@ const props = defineProps<{
     }>;
 }>();
 
+const tenantRoute = useTenantRoute();
 const page = usePage<SharedProps>();
 const currentUserId = computed(() => page.props.auth.user?.id);
 
@@ -30,7 +32,7 @@ function confirmDelete(user: { id: number; name: string }) {
 
 function deleteUser() {
     if (!userToDelete.value) return;
-    router.delete(route('staff.users.destroy', userToDelete.value.id), {
+    router.delete(tenantRoute('staff.users.destroy', userToDelete.value.id), {
         preserveScroll: true,
     });
     userToDelete.value = null;
@@ -43,7 +45,7 @@ function deleteUser() {
     <PageHeader title="Staff Accounts" :subtitle="`${staffUsers.length} staff member${staffUsers.length === 1 ? '' : 's'}`">
         <template #actions>
             <Link
-                :href="route('staff.users.create')"
+                :href="tenantRoute('staff.users.create')"
                 class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
             >
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -115,7 +117,7 @@ function deleteUser() {
         >
             <template #action>
                 <Link
-                    :href="route('staff.users.create')"
+                    :href="tenantRoute('staff.users.create')"
                     class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
                 >
                     Add Staff Member

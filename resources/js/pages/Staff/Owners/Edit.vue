@@ -5,8 +5,11 @@ import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import OwnerForm from '@/Components/Kennel/OwnerForm.vue';
 import type { OwnerFormData } from '@/Components/Kennel/OwnerForm.vue';
 import type { Owner } from '@/types/kennel';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const props = defineProps<{ owner: Owner }>();
 
@@ -21,7 +24,7 @@ const form = useForm<OwnerFormData>({
 });
 
 function submit() {
-    form.patch(route('staff.owners.update', props.owner.id));
+    form.patch(tenantRoute('staff.owners.update', props.owner.id));
 }
 </script>
 
@@ -31,8 +34,8 @@ function submit() {
     <PageHeader
         :title="`Edit ${owner.name}`"
         :breadcrumbs="[
-            { label: 'Owners', href: route('staff.owners.index') },
-            { label: owner.name, href: route('staff.owners.show', owner.id) },
+            { label: 'Owners', href: tenantRoute('staff.owners.index') },
+            { label: owner.name, href: tenantRoute('staff.owners.show', owner.id) },
             { label: 'Edit' },
         ]"
     />
@@ -41,7 +44,7 @@ function submit() {
         <OwnerForm :form="form" :is-editing="true" @submit="submit">
             <template #cancel>
                 <Link
-                    :href="route('staff.owners.show', owner.id)"
+                    :href="tenantRoute('staff.owners.show', owner.id)"
                     class="rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 transition-colors"
                 >
                     Cancel

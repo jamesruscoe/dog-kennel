@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm, router } from '@inertiajs/vue3';
 import KennelLayout from '@/Layouts/KennelLayout.vue';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import StatusBadge from '@/Components/Kennel/StatusBadge.vue';
 import ConfirmModal from '@/Components/Kennel/ConfirmModal.vue';
@@ -10,6 +11,8 @@ import type { Booking } from '@/types/kennel';
 
 defineOptions({ layout: KennelLayout });
 
+const tenantRoute = useTenantRoute();
+
 const props = defineProps<{ booking: Booking }>();
 
 // Reject form
@@ -17,7 +20,7 @@ const rejectModal = ref<InstanceType<typeof ConfirmModal>>();
 const rejectForm = useForm({ rejection_reason: '' });
 
 function submitReject() {
-    rejectForm.patch(route('staff.bookings.reject', props.booking.id), {
+    rejectForm.patch(tenantRoute('staff.bookings.reject', props.booking.id), {
         onSuccess: () => rejectModal.value?.hide(),
     });
 }
@@ -27,17 +30,17 @@ const cancelModal = ref<InstanceType<typeof ConfirmModal>>();
 const cancelForm = useForm({ cancellation_reason: '' });
 
 function submitCancel() {
-    cancelForm.patch(route('staff.bookings.cancel', props.booking.id), {
+    cancelForm.patch(tenantRoute('staff.bookings.cancel', props.booking.id), {
         onSuccess: () => cancelModal.value?.hide(),
     });
 }
 
 function approve() {
-    router.patch(route('staff.bookings.approve', props.booking.id));
+    router.patch(tenantRoute('staff.bookings.approve', props.booking.id));
 }
 
 function complete() {
-    router.patch(route('staff.bookings.complete', props.booking.id));
+    router.patch(tenantRoute('staff.bookings.complete', props.booking.id));
 }
 
 function formatDate(d: string) {
@@ -60,7 +63,7 @@ const ACTIVITY_LABELS: Record<string, string> = {
 
     <PageHeader
         :title="`Booking #${booking.id}`"
-        :breadcrumbs="[{ label: 'Bookings', href: route('staff.bookings.index') }, { label: `#${booking.id}` }]"
+        :breadcrumbs="[{ label: 'Bookings', href: tenantRoute('staff.bookings.index') }, { label: `#${booking.id}` }]"
     >
         <template #actions>
             <!-- Approve (pending only) -->
@@ -173,7 +176,7 @@ const ACTIVITY_LABELS: Record<string, string> = {
                     <div>
                         <dt class="text-xs font-medium text-zinc-500 uppercase tracking-wide">Name</dt>
                         <dd class="mt-0.5">
-                            <Link :href="route('staff.dogs.show', booking.dog.id)" class="text-zinc-800 dark:text-zinc-200 hover:text-indigo-600">
+                            <Link :href="tenantRoute('staff.dogs.show', booking.dog.id)" class="text-zinc-800 dark:text-zinc-200 hover:text-indigo-600">
                                 {{ booking.dog.name }}
                             </Link>
                         </dd>
@@ -185,7 +188,7 @@ const ACTIVITY_LABELS: Record<string, string> = {
                     <div v-if="booking.dog.owner">
                         <dt class="text-xs font-medium text-zinc-500 uppercase tracking-wide">Owner</dt>
                         <dd class="mt-0.5">
-                            <Link :href="route('staff.owners.show', booking.dog.owner.id)" class="text-zinc-800 dark:text-zinc-200 hover:text-indigo-600">
+                            <Link :href="tenantRoute('staff.owners.show', booking.dog.owner.id)" class="text-zinc-800 dark:text-zinc-200 hover:text-indigo-600">
                                 {{ booking.dog.owner.name }}
                             </Link>
                         </dd>
@@ -229,7 +232,7 @@ const ACTIVITY_LABELS: Record<string, string> = {
                     </h2>
                     <Link
                         v-if="booking.status === 'approved'"
-                        :href="route('staff.care-logs.create', booking.id)"
+                        :href="tenantRoute('staff.care-logs.create', booking.id)"
                         class="text-xs font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
                     >
                         + Log activity

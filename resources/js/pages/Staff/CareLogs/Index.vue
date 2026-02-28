@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import KennelLayout from '@/Layouts/KennelLayout.vue';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import EmptyState from '@/Components/Kennel/EmptyState.vue';
 import Pagination from '@/Components/Kennel/Pagination.vue';
@@ -9,6 +10,8 @@ import { ref } from 'vue';
 import type { ActivityType, CareLog, Paginated } from '@/types/kennel';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const props = defineProps<{
     logs: Paginated<CareLog>;
@@ -38,7 +41,7 @@ function setType(value: ActivityType | '') {
 
 function applyFilters() {
     router.get(
-        route('staff.care-logs.index'),
+        tenantRoute('staff.care-logs.index'),
         {
             activity_type: activeType.value || undefined,
             date_from:     dateFrom.value || undefined,
@@ -66,7 +69,7 @@ function confirmDelete(log: CareLog) {
 
 function deleteLog() {
     if (!logToDelete.value) return;
-    router.delete(route('staff.care-logs.destroy', logToDelete.value.id), { preserveScroll: true });
+    router.delete(tenantRoute('staff.care-logs.destroy', logToDelete.value.id), { preserveScroll: true });
 }
 
 function formatDateTime(d: string) {
@@ -170,7 +173,7 @@ const ACTIVITY_COLORS: Record<string, string> = {
                         </span>
                     </td>
                     <td class="px-4 py-3">
-                        <Link :href="route('staff.bookings.show', log.booking_id)" class="group">
+                        <Link :href="tenantRoute('staff.bookings.show', log.booking_id)" class="group">
                             <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600">
                                 {{ log.booking?.dog?.name ?? '—' }}
                             </p>

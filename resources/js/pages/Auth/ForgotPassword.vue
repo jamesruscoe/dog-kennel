@@ -1,28 +1,28 @@
-<script setup>
+<script setup lang="ts">
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
+import { computed } from 'vue';
+import type { SharedProps } from '@/types/kennel';
 
-const page = usePage();
+defineProps<{ status?: string }>();
 
-defineProps({
-    status: {
-        type: String,
-    },
-});
+const page = usePage<SharedProps>();
+const company = computed(() => page.props.company);
 
-const form = useForm({
-    _token: page.props.csrf_token,
-    email: '',
-});
+const submitRoute = computed(() =>
+    company.value ? route('tenant.password.email', { company: company.value.slug }) : route('password.email')
+);
+const loginRoute = computed(() =>
+    company.value ? route('tenant.login', { company: company.value.slug }) : route('login')
+);
 
-const submit = () => {
-    form.post(route('password.email'));
-};
+const form = useForm({ email: '' });
+
+const submit = () => { form.post(submitRoute.value); };
 </script>
 
 <template>
@@ -71,7 +71,7 @@ const submit = () => {
 
             <div class="mt-4 text-center">
                 <Link
-                    :href="route('login')"
+                    :href="loginRoute"
                     class="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                 >
                     Back to sign in

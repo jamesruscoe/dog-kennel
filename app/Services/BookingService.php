@@ -9,7 +9,9 @@ use App\Events\BookingCreated;
 use App\Exceptions\BookingConflictException;
 use App\Exceptions\InvalidBookingDateException;
 use App\Exceptions\OperatingDayException;
+use App\Exceptions\StripeNotConfiguredException;
 use App\Models\Booking;
+use App\Models\CompanyContext;
 use App\Models\Dog;
 use App\Models\KennelSettings;
 use Carbon\Carbon;
@@ -20,6 +22,7 @@ class BookingService
 {
     public function __construct(
         private readonly CapacityService $capacityService,
+        private readonly StripeConnectionService $stripeService,
     ) {}
 
     /**
@@ -75,6 +78,14 @@ class BookingService
      */
     public function create(Dog $dog, array $data): Booking
     {
+        $company = app(CompanyContext::class);
+
+        if (! $this->stripeService->isReady($company)) {
+            throw new StripeNotConfiguredException(
+                'This company is not currently configured to accept bookings. Please contact the kennel.'
+            );
+        }
+
         $checkIn  = Carbon::parse($data['check_in_date']);
         $checkOut = Carbon::parse($data['check_out_date']);
 
@@ -82,12 +93,13 @@ class BookingService
         $this->validateOperatingDays($checkIn, $checkOut);
         $this->validateCapacity($checkIn, $checkOut);
 
-        $settings    = KennelSettings::sole();
+        $settings    = KennelSettings::firstOrFail();
         $nights      = $checkIn->diffInDays($checkOut);
         $amountPence = $nights * $settings->nightly_rate_pence;
 
-        return DB::transaction(function () use ($dog, $data, $checkIn, $checkOut, $amountPence) {
+        return DB::transaction(function () use ($dog, $data, $checkIn, $checkOut, $amountPence, $company) {
             $booking = Booking::create([
+                'company_id'           => $company->id,
                 'dog_id'               => $dog->id,
                 'check_in_date'        => $checkIn->toDateString(),
                 'check_out_date'       => $checkOut->toDateString(),
@@ -178,7 +190,7 @@ class BookingService
             throw new InvalidBookingDateException('Check-in date cannot be in the past.');
         }
 
-        $settings = KennelSettings::sole();
+        $settings = KennelSettings::firstOrFail();
         if ($settings->booking_lead_days > 0) {
             $minDate = today()->addDays($settings->booking_lead_days);
             if ($checkIn->lt($minDate)) {
@@ -191,7 +203,7 @@ class BookingService
 
     private function validateOperatingDays(Carbon $checkIn, Carbon $checkOut): void
     {
-        $settings = KennelSettings::sole();
+        $settings = KennelSettings::firstOrFail();
 
         if (!$settings->isOperatingDay($checkIn->isoWeekday())) {
             throw new OperatingDayException(

@@ -3,7 +3,7 @@
 // These are the canonical types used across all stores, services, and pages.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type UserRole = 'staff' | 'owner';
+export type UserRole = 'super_admin' | 'admin' | 'staff' | 'owner';
 
 export type BookingStatus =
     | 'pending'
@@ -31,6 +31,18 @@ export interface AuthUser {
     name: string;
     email: string;
     role: UserRole;
+    company_id: number | null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Company
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface Company {
+    id: number;
+    name: string;
+    slug: string;
+    stripe_ready: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -162,6 +174,7 @@ export interface Payment {
 export interface SharedProps {
     auth: { user: AuthUser | null };
     flash: { success: string | null; error: string | null };
+    company: Company | null;
     unread_notifications_count: number;
     csrf_token: string;
 }

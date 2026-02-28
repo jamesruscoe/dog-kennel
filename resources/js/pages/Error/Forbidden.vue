@@ -1,8 +1,25 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { usePage } from '@inertiajs/vue3';
+import type { SharedProps } from '@/types/kennel';
+
 defineProps<{
     status: number;
     message: string;
 }>();
+
+const page = usePage<SharedProps>();
+
+const homeHref = computed(() => {
+    const user = page.props.auth?.user;
+    const company = page.props.company;
+    if (!user) return '/';
+    if (company) {
+        if (user.role === 'owner') return route('owner.dashboard', { company: company.slug });
+        return route('staff.dashboard', { company: company.slug });
+    }
+    return route('platform.dashboard');
+});
 </script>
 
 <template>
@@ -17,7 +34,7 @@ defineProps<{
                 {{ message }}
             </p>
             <Link
-                :href="route('dashboard')"
+                :href="homeHref"
                 class="inline-block bg-zinc-800 dark:bg-zinc-100 text-white dark:text-zinc-900 px-6 py-2.5 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
             >
                 Go to Dashboard

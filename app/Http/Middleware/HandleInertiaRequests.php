@@ -28,12 +28,16 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'auth' => [
                 'user' => $user ? [
-                    'id'    => $user->id,
-                    'name'  => $user->name,
-                    'email' => $user->email,
-                    'role'  => $user->role?->value,
+                    'id'         => $user->id,
+                    'name'       => $user->name,
+                    'email'      => $user->email,
+                    'role'       => $user->role?->value,
+                    'company_id' => $user->company_id,
                 ] : null,
             ],
+            // company is shared by ResolveCompanyFromPath for tenant routes;
+            // default null ensures the prop exists on root/platform routes too.
+            'company' => null,
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error'   => $request->session()->get('error'),

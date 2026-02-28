@@ -5,8 +5,11 @@ import KennelLayout from '@/Layouts/KennelLayout.vue';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import StatusBadge from '@/Components/Kennel/StatusBadge.vue';
 import type { Booking } from '@/types/kennel';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const props = defineProps<{ booking: Booking }>();
 
@@ -35,7 +38,7 @@ const form = useForm({
 });
 
 function submit() {
-    form.post(route('staff.care-logs.store', props.booking.id), {
+    form.post(tenantRoute('staff.care-logs.store', props.booking.id), {
         onSuccess: () => form.reset('notes'),
     });
 }
@@ -62,8 +65,8 @@ const ACTIVITY_COLORS: Record<string, string> = {
     <PageHeader
         :title="`Log Activity`"
         :breadcrumbs="[
-            { label: 'Bookings', href: route('staff.bookings.index') },
-            { label: `#${booking.id}`, href: route('staff.bookings.show', booking.id) },
+            { label: 'Bookings', href: tenantRoute('staff.bookings.index') },
+            { label: `#${booking.id}`, href: tenantRoute('staff.bookings.show', booking.id) },
             { label: 'Log Activity' },
         ]"
     />
@@ -128,7 +131,7 @@ const ACTIVITY_COLORS: Record<string, string> = {
                 <!-- Actions -->
                 <div class="flex items-center justify-end gap-3">
                     <Link
-                        :href="route('staff.bookings.show', booking.id)"
+                        :href="tenantRoute('staff.bookings.show', booking.id)"
                         class="rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
                     >
                         Cancel

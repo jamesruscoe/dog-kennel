@@ -3,8 +3,11 @@ import { ref, computed, onMounted, watch } from 'vue';
 import KennelLayout from '@/Layouts/KennelLayout.vue';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import type { KennelSettings } from '@/types/kennel';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const props = defineProps<{ settings: KennelSettings }>();
 
@@ -45,7 +48,7 @@ const loading      = ref(false);
 async function fetchOccupancy() {
     loading.value = true;
     try {
-        const url = route('staff.calendar.occupancy', { year: year.value, month: month.value });
+        const url = tenantRoute('staff.calendar.occupancy', { year: year.value, month: month.value });
         const res = await fetch(url, {
             headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
         });
@@ -351,7 +354,7 @@ function formatSelectedDate(dateStr: string): string {
 
                             <!-- Quick link to bookings for that date -->
                             <Link
-                                :href="route('staff.bookings.index', { date_from: selectedDay.date, date_to: selectedDay.date })"
+                                :href="tenantRoute('staff.bookings.index', { date_from: selectedDay.date, date_to: selectedDay.date })"
                                 class="block w-full rounded-md border border-zinc-200 dark:border-zinc-700 px-3 py-2 text-center text-xs font-medium text-zinc-600 dark:text-zinc-400 hover:border-indigo-400 hover:text-indigo-600 transition-colors"
                             >
                                 View bookings for this day

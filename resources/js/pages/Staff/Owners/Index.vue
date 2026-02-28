@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import KennelLayout from '@/Layouts/KennelLayout.vue';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import SearchFilter from '@/Components/Kennel/SearchFilter.vue';
 import EmptyState from '@/Components/Kennel/EmptyState.vue';
@@ -10,6 +11,8 @@ import { ref } from 'vue';
 import type { Owner, Paginated } from '@/types/kennel';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const props = defineProps<{
     owners: Paginated<Owner>;
@@ -21,7 +24,7 @@ const activeFilter = ref(props.filters.active === '1' || props.filters.active ==
 function toggleActive() {
     activeFilter.value = !activeFilter.value;
     router.get(
-        route('staff.owners.index'),
+        tenantRoute('staff.owners.index'),
         { ...props.filters, active: activeFilter.value ? '1' : undefined },
         { preserveState: true, replace: true },
     );
@@ -37,7 +40,7 @@ function confirmDelete(owner: Owner) {
 
 function deleteOwner() {
     if (!ownerToDelete.value) return;
-    router.delete(route('staff.owners.destroy', ownerToDelete.value.id), {
+    router.delete(tenantRoute('staff.owners.destroy', ownerToDelete.value.id), {
         preserveScroll: true,
     });
 }
@@ -49,7 +52,7 @@ function deleteOwner() {
     <PageHeader title="Owners" :subtitle="`${owners.total} owner${owners.total === 1 ? '' : 's'} registered`">
         <template #actions>
             <Link
-                :href="route('staff.owners.create')"
+                :href="tenantRoute('staff.owners.create')"
                 class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
             >
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -101,7 +104,7 @@ function deleteOwner() {
                     class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors"
                 >
                     <td class="px-4 py-3">
-                        <Link :href="route('staff.owners.show', owner.id)" class="group flex items-center gap-3">
+                        <Link :href="tenantRoute('staff.owners.show', owner.id)" class="group flex items-center gap-3">
                             <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-xs font-bold text-indigo-700 dark:text-indigo-300">
                                 {{ owner.name.charAt(0).toUpperCase() }}
                             </div>
@@ -119,7 +122,7 @@ function deleteOwner() {
                     <td class="px-4 py-3 text-right">
                         <div class="flex items-center justify-end gap-2">
                             <Link
-                                :href="route('staff.owners.edit', owner.id)"
+                                :href="tenantRoute('staff.owners.edit', owner.id)"
                                 class="text-xs text-zinc-500 hover:text-indigo-600 transition-colors"
                             >
                                 Edit
@@ -153,7 +156,7 @@ function deleteOwner() {
         >
             <template #action>
                 <Link
-                    :href="route('staff.owners.create')"
+                    :href="tenantRoute('staff.owners.create')"
                     class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
                 >
                     Add Owner

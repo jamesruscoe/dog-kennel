@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import KennelLayout from '@/Layouts/KennelLayout.vue';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import StatusBadge from '@/Components/Kennel/StatusBadge.vue';
 import SearchFilter from '@/Components/Kennel/SearchFilter.vue';
@@ -10,6 +11,8 @@ import { ref } from 'vue';
 import type { Booking, BookingStatus, Paginated } from '@/types/kennel';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const props = defineProps<{
     bookings: Paginated<Booking>;
@@ -32,7 +35,7 @@ const activeTab = ref<BookingStatus | ''>(
 function setTab(value: BookingStatus | '') {
     activeTab.value = value;
     router.get(
-        route('staff.bookings.index'),
+        tenantRoute('staff.bookings.index'),
         { ...props.filters, status: value || undefined },
         { preserveState: true, replace: true },
     );
@@ -49,7 +52,7 @@ function formatDate(d: string) {
     <PageHeader title="Bookings" :subtitle="`${bookings.total} booking${bookings.total === 1 ? '' : 's'}`">
         <template #actions>
             <Link
-                :href="route('staff.bookings.create')"
+                :href="tenantRoute('staff.bookings.create')"
                 class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
             >
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -108,7 +111,7 @@ function formatDate(d: string) {
                     class="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors"
                 >
                     <td class="px-4 py-3">
-                        <Link :href="route('staff.bookings.show', booking.id)" class="group">
+                        <Link :href="tenantRoute('staff.bookings.show', booking.id)" class="group">
                             <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600">
                                 {{ booking.dog?.name ?? '—' }}
                             </p>
@@ -126,7 +129,7 @@ function formatDate(d: string) {
                     </td>
                     <td class="px-4 py-3 text-right">
                         <Link
-                            :href="route('staff.bookings.show', booking.id)"
+                            :href="tenantRoute('staff.bookings.show', booking.id)"
                             class="text-xs text-zinc-500 hover:text-indigo-600 transition-colors"
                         >
                             View
@@ -143,7 +146,7 @@ function formatDate(d: string) {
         >
             <template #action>
                 <Link
-                    :href="route('staff.bookings.create')"
+                    :href="tenantRoute('staff.bookings.create')"
                     class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
                 >
                     New Booking

@@ -1,16 +1,25 @@
 <script setup lang="ts">
 import { router, usePage } from '@inertiajs/vue3';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useNotificationStore } from '@/stores/useNotificationStore';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 import type { SharedProps } from '@/types/kennel';
 
 const page = usePage<SharedProps>();
 const auth = computed(() => page.props.auth);
 const flash = computed(() => page.props.flash);
-const isStaff = computed(() => auth.value.user?.role === 'staff');
+const company = computed(() => page.props.company);
+
+const role = computed(() => auth.value.user?.role);
+const isStaff = computed(() => role.value === 'staff' || role.value === 'admin');
+const isAdmin = computed(() => role.value === 'admin' || role.value === 'super_admin');
+
+const stripeWarning = computed(() => company.value && !company.value.stripe_ready);
 
 const notificationStore = useNotificationStore();
 const unreadCount = computed(() => page.props.unread_notifications_count ?? 0);
+
+const tenantRoute = useTenantRoute();
 
 // Flash toast auto-dismiss
 const flashVisible = ref(false);
@@ -25,24 +34,32 @@ watch(() => flash.value, (f) => {
 const sidebarOpen = ref(false);
 
 // ── Navigation definitions ─────────────────────────────────────────────────
-const staffNav = [
-    { label: 'Dashboard',  href: () => route('staff.dashboard'),    icon: 'home' },
-    { label: 'Owners',     href: () => route('staff.owners.index'), icon: 'users' },
-    { label: 'Dogs',       href: () => route('staff.dogs.index'),   icon: 'dog' },
-    { label: 'Bookings',   href: () => route('staff.bookings.index'), icon: 'calendar-days' },
-    { label: 'Care Logs',  href: () => route('staff.care-logs.index'), icon: 'clipboard-list' },
-    { label: 'Calendar',   href: () => route('staff.calendar.index'), icon: 'calendar' },
-    { label: 'Settings',   href: () => route('staff.settings.edit'), icon: 'cog' },
-    { label: 'Staff Users', href: () => route('staff.users.index'),  icon: 'user-shield' },
+const staffNavBase = [
+    { label: 'Dashboard',   href: () => tenantRoute('staff.dashboard'),      icon: 'home' },
+    { label: 'Owners',      href: () => tenantRoute('staff.owners.index'),   icon: 'users' },
+    { label: 'Dogs',        href: () => tenantRoute('staff.dogs.index'),     icon: 'dog' },
+    { label: 'Bookings',    href: () => tenantRoute('staff.bookings.index'), icon: 'calendar-days' },
+    { label: 'Care Logs',   href: () => tenantRoute('staff.care-logs.index'), icon: 'clipboard-list' },
+    { label: 'Calendar',    href: () => tenantRoute('staff.calendar.index'), icon: 'calendar' },
+    { label: 'Settings',    href: () => tenantRoute('staff.settings.edit'),  icon: 'cog' },
+    { label: 'Staff Users', href: () => tenantRoute('staff.users.index'),    icon: 'user-shield' },
+];
+
+const adminNavExtra = [
+    { label: 'Finance', href: () => tenantRoute('staff.finance.index'), icon: 'banknotes' },
 ];
 
 const ownerNav = [
-    { label: 'Dashboard', href: () => route('owner.dashboard'),       icon: 'home' },
-    { label: 'Bookings',  href: () => route('owner.bookings.index'),  icon: 'calendar-days' },
-    { label: 'My Dogs',   href: () => route('owner.dogs.index'),      icon: 'dog' },
+    { label: 'Dashboard', href: () => tenantRoute('owner.dashboard'),      icon: 'home' },
+    { label: 'Bookings',  href: () => tenantRoute('owner.bookings.index'), icon: 'calendar-days' },
+    { label: 'My Dogs',   href: () => tenantRoute('owner.dogs.index'),     icon: 'dog' },
 ];
 
-const navItems = computed(() => isStaff.value ? staffNav : ownerNav);
+const navItems = computed(() =>
+    isStaff.value
+        ? (isAdmin.value ? [...staffNavBase, ...adminNavExtra] : staffNavBase)
+        : ownerNav
+);
 
 function isActiveRoute(href: string): boolean {
     const current = window.location.pathname;
@@ -51,12 +68,12 @@ function isActiveRoute(href: string): boolean {
 }
 
 function logout() {
-    router.post(route('logout'));
+    if (company.value) {
+        router.post(tenantRoute('tenant.logout'));
+    } else {
+        router.post(route('logout'));
+    }
 }
-
-onMounted(() => {
-    // Seed unread count from shared prop
-});
 </script>
 
 <template>
@@ -142,6 +159,10 @@ onMounted(() => {
                             <svg v-else-if="item.icon === 'user-shield'" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                             </svg>
+                            <!-- Banknotes icon (Finance) -->
+                            <svg v-else-if="item.icon === 'banknotes'" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
+                            </svg>
                             <!-- Fallback dot -->
                             <span v-else class="h-1.5 w-1.5 rounded-full bg-current" />
 
@@ -174,6 +195,18 @@ onMounted(() => {
 
         <!-- ── Main area ─────────────────────────────────────────────────────── -->
         <div class="flex flex-1 flex-col overflow-hidden">
+
+            <!-- Stripe not configured banner -->
+            <div
+                v-if="stripeWarning"
+                class="flex shrink-0 items-center justify-center gap-2 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-700 px-4 py-2 text-xs font-medium text-amber-700 dark:text-amber-400"
+            >
+                <svg class="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+                <span v-if="isStaff">Stripe is not configured. Bookings are disabled until payment is set up.</span>
+                <span v-else>This company is not currently accepting bookings.</span>
+            </div>
             <!-- Top bar -->
             <header class="flex h-16 shrink-0 items-center justify-between border-b border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 sm:px-6">
                 <!-- Mobile hamburger -->
@@ -191,7 +224,7 @@ onMounted(() => {
 
                 <!-- Right: Notifications + user shortcut -->
                 <div class="flex items-center gap-3">
-                    <Link :href="route('notifications.index')" class="relative rounded-md p-2 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                    <Link :href="tenantRoute('notifications.index')" class="relative rounded-md p-2 text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                         </svg>

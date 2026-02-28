@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Company;
 use App\Models\KennelSettings;
 use Illuminate\Database\Seeder;
 
@@ -9,12 +10,15 @@ class KennelSettingsSeeder extends Seeder
 {
     public function run(): void
     {
-        // Ensure only ever one settings row exists
-        if (KennelSettings::exists()) {
+        $company = Company::where('slug', 'pawstay-demo')->firstOrFail();
+
+        // Per-company singleton — skip if already seeded for this company
+        if (KennelSettings::where('company_id', $company->id)->exists()) {
             return;
         }
 
         KennelSettings::create([
+            'company_id'           => $company->id,
             'max_capacity'         => 10,
             'nightly_rate_pence'   => 3500,          // £35.00/night
             'operating_days'       => [1, 2, 3, 4, 5, 6], // Mon–Sat
@@ -22,7 +26,7 @@ class KennelSettingsSeeder extends Seeder
             'check_out_time'       => '16:00',
             'booking_lead_days'    => 1,
             'terms_and_conditions' => <<<EOT
-Welcome to our kennel! By booking with us, you agree to the following:
+Welcome to PawStay Demo! By booking with us, you agree to the following:
 
 1. All dogs must be up to date with vaccinations.
 2. Dogs must be treated for fleas and ticks prior to boarding.

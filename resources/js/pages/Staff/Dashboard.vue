@@ -6,10 +6,13 @@ import KennelLayout from '@/Layouts/KennelLayout.vue';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import StatusBadge from '@/Components/Kennel/StatusBadge.vue';
 import type { Booking, StaffMetrics } from '@/types/kennel';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 
 Chart.register(...registerables);
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const props = defineProps<{
     metrics: StaffMetrics;
@@ -215,7 +218,7 @@ const accentText: Record<string, string> = {
                     <li v-for="b in checkInsToday" :key="b.id" class="flex items-center justify-between gap-2">
                         <div class="min-w-0">
                             <Link
-                                :href="route('staff.bookings.show', b.id)"
+                                :href="tenantRoute('staff.bookings.show', b.id)"
                                 class="text-sm font-medium text-zinc-800 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 truncate block"
                             >
                                 {{ b.dog?.name ?? '—' }}
@@ -237,7 +240,7 @@ const accentText: Record<string, string> = {
                     <li v-for="b in checkOutsToday" :key="b.id" class="flex items-center justify-between gap-2">
                         <div class="min-w-0">
                             <Link
-                                :href="route('staff.bookings.show', b.id)"
+                                :href="tenantRoute('staff.bookings.show', b.id)"
                                 class="text-sm font-medium text-zinc-800 dark:text-zinc-100 hover:text-indigo-600 dark:hover:text-indigo-400 truncate block"
                             >
                                 {{ b.dog?.name ?? '—' }}
@@ -260,7 +263,7 @@ const accentText: Record<string, string> = {
                 <p class="text-xs text-zinc-500 mt-0.5">Booking requests awaiting a decision.</p>
             </div>
             <Link
-                :href="route('staff.bookings.index', { status: 'pending' })"
+                :href="tenantRoute('staff.bookings.index', { status: 'pending' })"
                 class="text-xs font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
             >
                 View all →
@@ -293,7 +296,7 @@ const accentText: Record<string, string> = {
                     <td class="px-6 py-3 text-zinc-600 dark:text-zinc-400">{{ b.amount_display ?? '—' }}</td>
                     <td class="px-6 py-3 text-right">
                         <Link
-                            :href="route('staff.bookings.show', b.id)"
+                            :href="tenantRoute('staff.bookings.show', b.id)"
                             class="text-xs font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 whitespace-nowrap"
                         >
                             Review →

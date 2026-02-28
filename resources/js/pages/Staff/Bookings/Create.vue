@@ -4,8 +4,11 @@ import { computed } from 'vue';
 import KennelLayout from '@/Layouts/KennelLayout.vue';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import type { Dog, KennelSettings } from '@/types/kennel';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const props = defineProps<{
     dogs: Dog[];
@@ -46,7 +49,7 @@ const minCheckOut = computed(() => {
 });
 
 function submit() {
-    form.post(route('staff.bookings.store'));
+    form.post(tenantRoute('staff.bookings.store'));
 }
 </script>
 
@@ -55,7 +58,7 @@ function submit() {
 
     <PageHeader
         title="New Booking"
-        :breadcrumbs="[{ label: 'Bookings', href: route('staff.bookings.index') }, { label: 'New' }]"
+        :breadcrumbs="[{ label: 'Bookings', href: tenantRoute('staff.bookings.index') }, { label: 'New' }]"
     />
 
     <div class="max-w-2xl">
@@ -157,7 +160,7 @@ function submit() {
             <!-- Actions -->
             <div class="flex items-center justify-end gap-3">
                 <Link
-                    :href="route('staff.bookings.index')"
+                    :href="tenantRoute('staff.bookings.index')"
                     class="rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
                 >
                     Cancel

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Company;
 use App\Models\Owner;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -19,6 +20,7 @@ class OwnerFactory extends Factory
     public function definition(): array
     {
         return [
+            'company_id'              => Company::factory(),
             'user_id'                 => User::factory()->owner(),
             'phone'                   => fake()->phoneNumber(),
             'address'                 => fake()->address(),
@@ -28,11 +30,13 @@ class OwnerFactory extends Factory
         ];
     }
 
-    /**
-     * Create the owner with an existing user instead of creating a new one.
-     */
     public function forUser(User $user): static
     {
         return $this->state(['user_id' => $user->id]);
+    }
+
+    public function forCompany(Company $company): static
+    {
+        return $this->state(['company_id' => $company->id]);
     }
 }

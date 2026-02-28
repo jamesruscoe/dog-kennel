@@ -3,6 +3,9 @@ import KennelLayout from '@/Layouts/KennelLayout.vue';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import EmptyState from '@/Components/Kennel/EmptyState.vue';
 import type { Dog } from '@/types/kennel';
+import { useTenantRoute } from '@/composables/useTenantRoute';
+
+const tenantRoute = useTenantRoute();
 
 defineOptions({ layout: KennelLayout });
 
@@ -38,7 +41,7 @@ function formatAge(dog: Dog): string | null {
     <PageHeader title="My Dogs" :subtitle="`${dogs.length} dog${dogs.length === 1 ? '' : 's'} on your profile`">
         <template #actions>
             <Link
-                :href="route('owner.dogs.create')"
+                :href="tenantRoute('owner.dogs.create')"
                 class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
             >
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -53,7 +56,7 @@ function formatAge(dog: Dog): string | null {
         <Link
             v-for="dog in dogs"
             :key="dog.id"
-            :href="route('owner.dogs.show', dog.id)"
+            :href="tenantRoute('owner.dogs.show', dog.id)"
             class="group rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-5 hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors"
         >
             <div class="flex items-start justify-between">
@@ -93,7 +96,7 @@ function formatAge(dog: Dog): string | null {
     >
         <template #action>
             <Link
-                :href="route('owner.dogs.create')"
+                :href="tenantRoute('owner.dogs.create')"
                 class="inline-flex items-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
             >
                 Add Your First Dog

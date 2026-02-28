@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\BelongsToCompany;
 use Database\Factories\CareLogFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,12 +12,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CareLog extends Model
 {
     /** @use HasFactory<CareLogFactory> */
-    use HasFactory;
+    use HasFactory, BelongsToCompany;
 
     /**
      * @var list<string>
      */
     protected $fillable = [
+        'company_id',
         'booking_id',
         'logged_by',
         'activity_type',

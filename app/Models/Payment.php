@@ -2,15 +2,19 @@
 
 namespace App\Models;
 
+use App\Models\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Payment extends Model
 {
+    use BelongsToCompany;
+
     /**
      * @var list<string>
      */
     protected $fillable = [
+        'company_id',
         'booking_id',
         'stripe_payment_id',
         'stripe_payment_intent_id',

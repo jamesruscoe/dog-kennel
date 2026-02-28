@@ -4,8 +4,11 @@ import { computed } from 'vue';
 import KennelLayout from '@/Layouts/KennelLayout.vue';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import type { KennelSettings } from '@/types/kennel';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const props = defineProps<{ settings: KennelSettings }>();
 
@@ -56,7 +59,7 @@ function submit() {
             booking_lead_days:    data.booking_lead_days,
             terms_and_conditions: data.terms_and_conditions || null,
         }))
-        .patch(route('staff.settings.update'));
+        .patch(tenantRoute('staff.settings.update'));
 }
 </script>
 

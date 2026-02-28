@@ -3,16 +3,19 @@
 namespace App\Models;
 
 use App\Enums\DayOfWeek;
+use App\Models\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use LogicException;
 
 class KennelSettings extends Model
 {
+    use BelongsToCompany;
+
     /**
      * @var list<string>
      */
     protected $fillable = [
+        'company_id',
         'max_capacity',
         'nightly_rate_pence',
         'operating_days',
@@ -33,23 +36,6 @@ class KennelSettings extends Model
             'nightly_rate_pence' => 'integer',
             'booking_lead_days' => 'integer',
         ];
-    }
-
-    // -------------------------------------------------------------------------
-    // Singleton enforcement
-    // -------------------------------------------------------------------------
-
-    /**
-     * Prevent direct instantiation of more than one settings row.
-     * Use KennelSettings::sole() to fetch the single settings row.
-     */
-    protected static function booted(): void
-    {
-        static::creating(function () {
-            if (static::exists()) {
-                throw new LogicException('Only one KennelSettings row may exist.');
-            }
-        });
     }
 
     // -------------------------------------------------------------------------

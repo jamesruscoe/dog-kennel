@@ -1,24 +1,25 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import type { SharedProps } from '@/types/kennel';
 
-const props = defineProps({
-    status: {
-        type: String,
-    },
-});
+const props = defineProps<{ status?: string }>();
+
+const page = usePage<SharedProps>();
+const company = computed(() => page.props.company);
+
+const sendRoute = computed(() =>
+    company.value ? route('tenant.verification.send', { company: company.value.slug }) : route('verification.send')
+);
+const logoutRoute = computed(() =>
+    company.value ? route('tenant.logout', { company: company.value.slug }) : route('logout')
+);
 
 const form = useForm({});
-
-const submit = () => {
-    form.post(route('verification.send'));
-};
-
-const verificationLinkSent = computed(
-    () => props.status === 'verification-link-sent',
-);
+const submit = () => { form.post(sendRoute.value); };
+const verificationLinkSent = computed(() => props.status === 'verification-link-sent');
 </script>
 
 <template>
@@ -55,7 +56,7 @@ const verificationLinkSent = computed(
 
             <div class="mt-4 text-center">
                 <Link
-                    :href="route('logout')"
+                    :href="logoutRoute"
                     method="post"
                     as="button"
                     class="text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"

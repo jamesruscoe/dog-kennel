@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\BookingStatus;
 use App\Models\Booking;
+use App\Models\Company;
 use App\Models\Dog;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,6 +26,7 @@ class BookingFactory extends Factory
         $checkOut = $checkIn->copy()->addDays($nights);
 
         return [
+            'company_id'           => Company::factory(),
             'dog_id'               => Dog::factory(),
             'check_in_date'        => $checkIn->toDateString(),
             'check_out_date'       => $checkOut->toDateString(),
@@ -109,5 +111,10 @@ class BookingFactory extends Factory
                 'status'         => BookingStatus::Completed->value,
             ];
         });
+    }
+
+    public function forCompany(Company $company): static
+    {
+        return $this->state(['company_id' => $company->id]);
     }
 }

@@ -80,7 +80,7 @@ const mainNavItems: NavItem[] = [
                     </Sheet>
                 </div>
 
-                <Link :href="route('dashboard')" class="flex items-center gap-x-2">
+                <Link :href="route('platform.dashboard')" class="flex items-center gap-x-2">
                     <AppLogo />
                 </Link>
 

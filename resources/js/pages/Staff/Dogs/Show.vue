@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import KennelLayout from '@/Layouts/KennelLayout.vue';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import StatusBadge from '@/Components/Kennel/StatusBadge.vue';
 import ConfirmModal from '@/Components/Kennel/ConfirmModal.vue';
@@ -10,6 +11,8 @@ import type { Booking, Dog } from '@/types/kennel';
 
 defineOptions({ layout: KennelLayout });
 
+const tenantRoute = useTenantRoute();
+
 const props = defineProps<{
     dog: Dog;
     bookings: Booking[];
@@ -18,7 +21,7 @@ const props = defineProps<{
 const deleteModal = ref<InstanceType<typeof ConfirmModal>>();
 
 function deleteDog() {
-    router.delete(route('staff.dogs.destroy', props.dog.id));
+    router.delete(tenantRoute('staff.dogs.destroy', props.dog.id));
 }
 </script>
 
@@ -29,13 +32,13 @@ function deleteDog() {
         :title="dog.name"
         :subtitle="dog.breed"
         :breadcrumbs="[
-            { label: 'Dogs', href: route('staff.dogs.index') },
+            { label: 'Dogs', href: tenantRoute('staff.dogs.index') },
             { label: dog.name },
         ]"
     >
         <template #actions>
             <Link
-                :href="route('staff.dogs.edit', dog.id)"
+                :href="tenantRoute('staff.dogs.edit', dog.id)"
                 class="inline-flex items-center gap-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
             >
                 Edit
@@ -70,7 +73,7 @@ function deleteDog() {
                         <dd class="mt-0.5">
                             <Link
                                 v-if="dog.owner"
-                                :href="route('staff.owners.show', dog.owner.id)"
+                                :href="tenantRoute('staff.owners.show', dog.owner.id)"
                                 class="text-zinc-800 dark:text-zinc-200 hover:text-indigo-600"
                             >
                                 {{ dog.owner.name }}
@@ -167,7 +170,7 @@ function deleteDog() {
                 <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800">
                     <h2 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Booking History</h2>
                     <Link
-                        :href="route('staff.bookings.create', { dog_id: dog.id })"
+                        :href="tenantRoute('staff.bookings.create', { dog_id: dog.id })"
                         class="text-xs font-medium text-indigo-600 hover:text-indigo-700"
                     >
                         + New booking
@@ -176,7 +179,7 @@ function deleteDog() {
                 <ul v-if="bookings.length > 0" class="divide-y divide-zinc-100 dark:divide-zinc-800">
                     <li v-for="booking in bookings" :key="booking.id" class="px-6 py-3 flex items-center justify-between">
                         <div>
-                            <Link :href="route('staff.bookings.show', booking.id)" class="text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:text-indigo-600">
+                            <Link :href="tenantRoute('staff.bookings.show', booking.id)" class="text-sm font-medium text-zinc-900 dark:text-zinc-100 hover:text-indigo-600">
                                 {{ new Date(booking.check_in_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}
                                 –
                                 {{ new Date(booking.check_out_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) }}

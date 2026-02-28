@@ -4,8 +4,11 @@ import { computed } from 'vue';
 import KennelLayout from '@/Layouts/KennelLayout.vue';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import type { Dog, KennelSettings } from '@/types/kennel';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const props = defineProps<{
     dogs: Dog[];
@@ -51,7 +54,7 @@ const operatingDayNames = computed(() =>
 );
 
 function submit() {
-    form.post(route('owner.bookings.store'));
+    form.post(tenantRoute('owner.bookings.store'));
 }
 </script>
 
@@ -60,7 +63,7 @@ function submit() {
 
     <PageHeader
         title="Request a Booking"
-        :breadcrumbs="[{ label: 'My Bookings', href: route('owner.bookings.index') }, { label: 'New Request' }]"
+        :breadcrumbs="[{ label: 'My Bookings', href: tenantRoute('owner.bookings.index') }, { label: 'New Request' }]"
     />
 
     <div class="max-w-2xl">
@@ -79,7 +82,7 @@ function submit() {
 
                 <div v-if="dogs.length === 0" class="text-sm text-zinc-500">
                     You have no dogs registered yet.
-                    <Link :href="route('owner.dogs.create')" class="text-indigo-600 hover:text-indigo-700">Add a dog</Link>
+                    <Link :href="tenantRoute('owner.dogs.create')" class="text-indigo-600 hover:text-indigo-700">Add a dog</Link>
                     before requesting a booking.
                 </div>
 
@@ -180,7 +183,7 @@ function submit() {
             <!-- Actions -->
             <div class="flex items-center justify-end gap-3">
                 <Link
-                    :href="route('owner.bookings.index')"
+                    :href="tenantRoute('owner.bookings.index')"
                     class="rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors"
                 >
                     Back

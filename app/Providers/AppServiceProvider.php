@@ -10,9 +10,18 @@ use App\Listeners\SendBookingApprovedNotification;
 use App\Listeners\SendBookingCancelledNotification;
 use App\Listeners\SendBookingCreatedNotification;
 use App\Listeners\SendCareLogAddedNotification;
+use App\Models\Booking;
+use App\Models\CareLog;
+use App\Models\Dog;
+use App\Models\Owner;
+use App\Policies\BookingPolicy;
+use App\Policies\CareLogPolicy;
+use App\Policies\DogPolicy;
+use App\Policies\OwnerPolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -40,6 +49,12 @@ class AppServiceProvider extends ServiceProvider
         // Existing scaffold disables mass-assignment protection globally.
         // All models declare $fillable as documentation / IDE support.
         Model::unguard();
+
+        // ── Policies ──────────────────────────────────────────────────────────
+        Gate::policy(Dog::class,     DogPolicy::class);
+        Gate::policy(Booking::class, BookingPolicy::class);
+        Gate::policy(CareLog::class, CareLogPolicy::class);
+        Gate::policy(Owner::class,   OwnerPolicy::class);
 
         // ── Domain event → listener mappings ─────────────────────────────────
         // All listeners implement ShouldQueue — dispatched asynchronously.

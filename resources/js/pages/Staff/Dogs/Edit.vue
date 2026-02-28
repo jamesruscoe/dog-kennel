@@ -5,8 +5,11 @@ import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import DogForm from '@/Components/Kennel/DogForm.vue';
 import type { DogFormData } from '@/Components/Kennel/DogForm.vue';
 import type { Dog, Owner } from '@/types/kennel';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const props = defineProps<{
     dog: Dog;
@@ -32,7 +35,7 @@ const form = useForm<DogFormData>({
 });
 
 function submit() {
-    form.patch(route('staff.dogs.update', props.dog.id));
+    form.patch(tenantRoute('staff.dogs.update', props.dog.id));
 }
 </script>
 
@@ -42,8 +45,8 @@ function submit() {
     <PageHeader
         :title="`Edit ${dog.name}`"
         :breadcrumbs="[
-            { label: 'Dogs', href: route('staff.dogs.index') },
-            { label: dog.name, href: route('staff.dogs.show', dog.id) },
+            { label: 'Dogs', href: tenantRoute('staff.dogs.index') },
+            { label: dog.name, href: tenantRoute('staff.dogs.show', dog.id) },
             { label: 'Edit' },
         ]"
     />
@@ -52,7 +55,7 @@ function submit() {
         <DogForm :form="form" :owners="owners" :is-editing="true" @submit="submit">
             <template #cancel>
                 <Link
-                    :href="route('staff.dogs.show', dog.id)"
+                    :href="tenantRoute('staff.dogs.show', dog.id)"
                     class="rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 transition-colors"
                 >
                     Cancel

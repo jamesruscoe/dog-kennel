@@ -1,21 +1,24 @@
-<script setup>
+<script setup lang="ts">
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import type { SharedProps } from '@/types/kennel';
 
-const props = defineProps({
-    email: {
-        type: String,
-        required: true,
-    },
-    token: {
-        type: String,
-        required: true,
-    },
-});
+const props = defineProps<{ email: string; token: string }>();
+
+const page = usePage<SharedProps>();
+const company = computed(() => page.props.company);
+
+const submitRoute = computed(() =>
+    company.value ? route('tenant.password.store', { company: company.value.slug }) : route('password.store')
+);
+const loginRoute = computed(() =>
+    company.value ? route('tenant.login', { company: company.value.slug }) : route('login')
+);
 
 const form = useForm({
     token: props.token,
@@ -25,7 +28,7 @@ const form = useForm({
 });
 
 const submit = () => {
-    form.post(route('password.store'), {
+    form.post(submitRoute.value, {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
 };
@@ -97,7 +100,7 @@ const submit = () => {
 
             <div class="mt-4 text-center">
                 <Link
-                    :href="route('login')"
+                    :href="loginRoute"
                     class="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                 >
                     Back to sign in

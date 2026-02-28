@@ -18,8 +18,8 @@
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ml-8 sm:flex">
                                 <NavLink
-                                    :href="route('dashboard')"
-                                    :active="route().current('dashboard')"
+                                    :href="route('platform.dashboard')"
+                                    :active="route().current('platform.dashboard')"
                                     class="text-sm font-medium text-gray-600 hover:text-black transition-colors"
                                 >
                                     Dashboard
@@ -130,8 +130,8 @@
                 >
                     <div class="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink
-                            :href="route('dashboard')"
-                            :active="route().current('dashboard')"
+                            :href="route('platform.dashboard')"
+                            :active="route().current('platform.dashboard')"
                             class="block py-2 px-4 text-base font-medium text-gray-600 hover:text-black hover:bg-gray-50"
                         >
                             Dashboard

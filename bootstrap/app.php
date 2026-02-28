@@ -3,10 +3,14 @@
 use App\Exceptions\BookingConflictException;
 use App\Exceptions\InvalidBookingDateException;
 use App\Exceptions\OperatingDayException;
+use App\Exceptions\StripeNotConfiguredException;
+use App\Http\Middleware\EnsureAdminOrSuperAdmin;
+use App\Http\Middleware\EnsureSuperAdmin;
 use App\Http\Middleware\EnsureUserIsOwner;
 use App\Http\Middleware\EnsureUserIsStaff;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\ResolveCompanyFromPath;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -34,8 +38,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->alias([
-            'role.staff' => EnsureUserIsStaff::class,
-            'role.owner' => EnsureUserIsOwner::class,
+            'role.staff'        => EnsureUserIsStaff::class,
+            'role.owner'        => EnsureUserIsOwner::class,
+            'role.admin'        => EnsureAdminOrSuperAdmin::class,
+            'role.super_admin'  => EnsureSuperAdmin::class,
+            'tenant'            => ResolveCompanyFromPath::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -54,6 +61,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->map(
             InvalidBookingDateException::class,
             fn (InvalidBookingDateException $e) => ValidationException::withMessages(['booking' => $e->getMessage()])
+        );
+        $exceptions->map(
+            StripeNotConfiguredException::class,
+            fn (StripeNotConfiguredException $e) => ValidationException::withMessages(['booking' => $e->getMessage()])
         );
 
         // ── Inertia-aware HTTP error rendering ────────────────────────────────

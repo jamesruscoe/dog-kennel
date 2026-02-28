@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\BelongsToCompany;
 use Database\Factories\DogFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,12 +15,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Dog extends Model
 {
     /** @use HasFactory<DogFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToCompany;
 
     /**
      * @var list<string>
      */
     protected $fillable = [
+        'company_id',
         'owner_id',
         'name',
         'breed',

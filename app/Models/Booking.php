@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BookingStatus;
+use App\Models\Traits\BelongsToCompany;
 use Database\Factories\BookingFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,12 +16,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Booking extends Model
 {
     /** @use HasFactory<BookingFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, BelongsToCompany;
 
     /**
      * @var list<string>
      */
     protected $fillable = [
+        'company_id',
         'dog_id',
         'check_in_date',
         'check_out_date',

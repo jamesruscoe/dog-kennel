@@ -6,6 +6,9 @@ import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import EmptyState from '@/Components/Kennel/EmptyState.vue';
 import Pagination from '@/Components/Kennel/Pagination.vue';
 import type { AppNotification } from '@/types/kennel';
+import { useTenantRoute } from '@/composables/useTenantRoute';
+
+const tenantRoute = useTenantRoute();
 
 interface PaginatedNotifications {
     data: AppNotification[];
@@ -67,7 +70,7 @@ function mapNotification(n: AppNotification): NotificationVM {
                 icon: '📋', iconBg: 'bg-blue-100 dark:bg-blue-900/40',
                 title: 'Booking Request Received',
                 message: d.message ?? `Booking request for ${d.dog_name ?? 'your dog'}.`,
-                href: d.booking_id ? route('owner.bookings.show', d.booking_id) : null,
+                href: d.booking_id ? tenantRoute('owner.bookings.show', d.booking_id) : null,
             };
         case 'BookingApprovedNotification':
             return {
@@ -75,7 +78,7 @@ function mapNotification(n: AppNotification): NotificationVM {
                 icon: '✅', iconBg: 'bg-green-100 dark:bg-green-900/40',
                 title: 'Booking Approved',
                 message: d.message ?? `Your booking for ${d.dog_name ?? 'your dog'} has been approved.`,
-                href: d.booking_id ? route('owner.bookings.show', d.booking_id) : null,
+                href: d.booking_id ? tenantRoute('owner.bookings.show', d.booking_id) : null,
             };
         case 'BookingCancelledNotification':
             return {
@@ -83,7 +86,7 @@ function mapNotification(n: AppNotification): NotificationVM {
                 icon: '❌', iconBg: 'bg-red-100 dark:bg-red-900/40',
                 title: 'Booking Cancelled',
                 message: d.message ?? `A booking for ${d.dog_name ?? 'your dog'} has been cancelled.`,
-                href: d.booking_id ? route('owner.bookings.show', d.booking_id) : null,
+                href: d.booking_id ? tenantRoute('owner.bookings.show', d.booking_id) : null,
             };
         case 'CareLogAddedNotification':
             return {
@@ -91,7 +94,7 @@ function mapNotification(n: AppNotification): NotificationVM {
                 icon: '🐾', iconBg: 'bg-amber-100 dark:bg-amber-900/40',
                 title: 'Care Activity Logged',
                 message: d.message ?? `${d.activity_label ?? 'Activity'} logged for ${d.dog_name ?? 'your dog'}.`,
-                href: d.booking_id ? route('owner.bookings.show', d.booking_id) : null,
+                href: d.booking_id ? tenantRoute('owner.bookings.show', d.booking_id) : null,
             };
         case 'NewBookingAlertNotification':
             return {
@@ -99,7 +102,7 @@ function mapNotification(n: AppNotification): NotificationVM {
                 icon: '🔔', iconBg: 'bg-purple-100 dark:bg-purple-900/40',
                 title: 'New Booking Request',
                 message: d.message ?? `New booking request from ${d.owner_name ?? 'an owner'}.`,
-                href: d.booking_id ? route('staff.bookings.show', d.booking_id) : null,
+                href: d.booking_id ? tenantRoute('staff.bookings.show', d.booking_id) : null,
             };
         default:
             return {
@@ -121,7 +124,7 @@ const unreadCount = computed(() =>
 );
 
 function markAllRead() {
-    router.patch(route('notifications.read-all'), {}, {
+    router.patch(tenantRoute('notifications.read-all'), {}, {
         preserveScroll: true,
         onSuccess: () => router.reload({ only: ['notifications'] }),
     });

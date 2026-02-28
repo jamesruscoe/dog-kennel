@@ -2,8 +2,11 @@
 import { useForm } from '@inertiajs/vue3';
 import KennelLayout from '@/Layouts/KennelLayout.vue';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
+import { useTenantRoute } from '@/composables/useTenantRoute';
 
 defineOptions({ layout: KennelLayout });
+
+const tenantRoute = useTenantRoute();
 
 const form = useForm({
     name: '',
@@ -13,7 +16,7 @@ const form = useForm({
 });
 
 function submit() {
-    form.post(route('staff.users.store'));
+    form.post(tenantRoute('staff.users.store'));
 }
 </script>
 
@@ -22,7 +25,7 @@ function submit() {
 
     <PageHeader
         title="Add Staff Member"
-        :breadcrumbs="[{ label: 'Staff Accounts', href: route('staff.users.index') }, { label: 'New Member' }]"
+        :breadcrumbs="[{ label: 'Staff Accounts', href: tenantRoute('staff.users.index') }, { label: 'New Member' }]"
     />
 
     <div class="max-w-lg">
@@ -75,7 +78,7 @@ function submit() {
 
             <div class="flex items-center justify-end gap-3 pt-2">
                 <Link
-                    :href="route('staff.users.index')"
+                    :href="tenantRoute('staff.users.index')"
                     class="rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 transition-colors"
                 >
                     Cancel
