@@ -240,19 +240,21 @@ const ACTIVITY_LABELS: Record<string, string> = {
                 </div>
 
                 <ul v-if="booking.care_logs && booking.care_logs.length > 0" class="divide-y divide-zinc-100 dark:divide-zinc-800">
-                    <li v-for="log in booking.care_logs" :key="log.id" class="px-6 py-4">
-                        <div class="flex items-start justify-between gap-4">
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                                    {{ ACTIVITY_LABELS[log.activity_type] ?? log.activity_type }}
-                                </p>
-                                <p v-if="log.notes" class="mt-0.5 text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap">{{ log.notes }}</p>
+                    <li v-for="log in booking.care_logs" :key="log.id">
+                        <Link :href="tenantRoute('staff.care-logs.show', log.id)" class="block px-6 py-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors">
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                                        {{ ACTIVITY_LABELS[log.activity_type] ?? log.activity_type }}
+                                    </p>
+                                    <p v-if="log.notes" class="mt-0.5 text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap">{{ log.notes }}</p>
+                                </div>
+                                <div class="shrink-0 text-right">
+                                    <p class="text-xs text-zinc-500">{{ formatDateTime(log.occurred_at) }}</p>
+                                    <p v-if="log.logged_by_user" class="text-xs text-zinc-400">by {{ log.logged_by_user.name }}</p>
+                                </div>
                             </div>
-                            <div class="shrink-0 text-right">
-                                <p class="text-xs text-zinc-500">{{ formatDateTime(log.occurred_at) }}</p>
-                                <p v-if="log.logged_by_user" class="text-xs text-zinc-400">by {{ log.logged_by_user.name }}</p>
-                            </div>
-                        </div>
+                        </Link>
                     </li>
                 </ul>
 

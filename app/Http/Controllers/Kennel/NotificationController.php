@@ -50,10 +50,14 @@ class NotificationController extends Controller
         return response()->json(['message' => 'Marked as read.']);
     }
 
-    public function markAllRead(Request $request): JsonResponse
+    public function markAllRead(Request $request): JsonResponse|\Illuminate\Http\RedirectResponse
     {
         $this->notificationService->markAllRead($request->user());
 
-        return response()->json(['message' => 'All notifications marked as read.']);
+        if ($request->wantsJson() && ! $request->header('X-Inertia')) {
+            return response()->json(['message' => 'All notifications marked as read.']);
+        }
+
+        return back()->with('success', 'All notifications marked as read.');
     }
 }

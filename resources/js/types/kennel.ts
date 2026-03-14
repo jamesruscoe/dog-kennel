@@ -119,6 +119,21 @@ export interface Booking {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Care Log Media
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface CareLogMedia {
+    id: number;
+    uuid: string;
+    name: string;
+    file_name: string;
+    mime_type: string | null;
+    size: number;
+    order: number | null;
+    signed_url: string | null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Care Log
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -131,6 +146,7 @@ export interface CareLog {
     activity_type: ActivityType;
     activity_label: string;
     notes: string | null;
+    media?: CareLogMedia[];
     occurred_at: string;
     created_at: string;
 }
@@ -168,6 +184,29 @@ export interface Payment {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Messaging
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface Message {
+    id: number;
+    conversation_id: number;
+    sender_id: number;
+    sender_name?: string;
+    body: string;
+    read_at: string | null;
+    created_at: string;
+}
+
+export interface Conversation {
+    id: number;
+    staff_user?: { id: number; name: string };
+    owner_user?: { id: number; name: string };
+    last_message_at: string | null;
+    unread_count: number;
+    latest_message?: Message;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Shared Inertia page props
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -176,6 +215,7 @@ export interface SharedProps {
     flash: { success: string | null; error: string | null };
     company: Company | null;
     unread_notifications_count: number;
+    unread_messages_count: number;
     csrf_token: string;
 }
 

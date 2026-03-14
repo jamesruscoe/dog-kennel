@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { router } from '@inertiajs/vue3';
+import { router, useForm } from '@inertiajs/vue3';
 import KennelLayout from '@/Layouts/KennelLayout.vue';
 import { useTenantRoute } from '@/composables/useTenantRoute';
 import PageHeader from '@/Components/Kennel/PageHeader.vue';
 import EmptyState from '@/Components/Kennel/EmptyState.vue';
 import Pagination from '@/Components/Kennel/Pagination.vue';
 import ConfirmModal from '@/Components/Kennel/ConfirmModal.vue';
+import LightboxModal from '@/Components/Kennel/LightboxModal.vue';
 import { ref } from 'vue';
-import type { ActivityType, CareLog, Paginated } from '@/types/kennel';
+import type { ActivityType, CareLog, CareLogMedia, Paginated } from '@/types/kennel';
 
 defineOptions({ layout: KennelLayout });
 
@@ -88,6 +89,62 @@ const ACTIVITY_COLORS: Record<string, string> = {
     health_check: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
     other:        'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
 };
+
+// Lightbox
+const lightboxImages = ref<CareLogMedia[]>([]);
+const lightboxIndex = ref(0);
+const lightboxOpen = ref(false);
+
+function openLightbox(media: CareLogMedia[], index: number) {
+    lightboxImages.value = media;
+    lightboxIndex.value = index;
+    lightboxOpen.value = true;
+}
+
+// Upload media
+const uploadLogId = ref<number | null>(null);
+const uploadForm = useForm<{ images: File[] }>({ images: [] });
+const uploadPreviews = ref<string[]>([]);
+
+function openUpload(logId: number) {
+    uploadLogId.value = logId;
+    uploadForm.reset();
+    uploadPreviews.value = [];
+}
+
+function onFilesSelected(e: Event) {
+    const input = e.target as HTMLInputElement;
+    if (!input.files) return;
+    const files = Array.from(input.files).slice(0, 5);
+    uploadForm.images = files;
+    uploadPreviews.value = files.map((f) => URL.createObjectURL(f));
+}
+
+function removeUploadFile(index: number) {
+    uploadForm.images.splice(index, 1);
+    URL.revokeObjectURL(uploadPreviews.value[index]);
+    uploadPreviews.value.splice(index, 1);
+}
+
+function submitUpload() {
+    if (!uploadLogId.value || uploadForm.images.length === 0) return;
+    uploadForm.post(tenantRoute('staff.care-logs.media.store', uploadLogId.value), {
+        preserveScroll: true,
+        forceFormData: true,
+        onSuccess: () => {
+            uploadLogId.value = null;
+            uploadForm.reset();
+            uploadPreviews.value = [];
+        },
+    });
+}
+
+function cancelUpload() {
+    uploadLogId.value = null;
+    uploadForm.reset();
+    uploadPreviews.value.forEach((u) => URL.revokeObjectURL(u));
+    uploadPreviews.value = [];
+}
 </script>
 
 <template>
@@ -151,6 +208,7 @@ const ACTIVITY_COLORS: Record<string, string> = {
                     <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Activity</th>
                     <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Dog / Booking</th>
                     <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Notes</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Photos</th>
                     <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Occurred</th>
                     <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500">Logged by</th>
                     <th class="relative px-4 py-3"><span class="sr-only">Actions</span></th>
@@ -184,13 +242,82 @@ const ACTIVITY_COLORS: Record<string, string> = {
                         <p v-if="log.notes" class="text-sm text-zinc-600 dark:text-zinc-400 truncate" :title="log.notes">{{ log.notes }}</p>
                         <span v-else class="text-sm text-zinc-300 dark:text-zinc-600">—</span>
                     </td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-1">
+                            <template v-if="log.media && log.media.filter(m => m.signed_url).length > 0">
+                                <button
+                                    v-for="(m, idx) in log.media.filter(m => m.signed_url).slice(0, 3)"
+                                    :key="m.id"
+                                    type="button"
+                                    class="h-8 w-8 rounded overflow-hidden border border-zinc-200 dark:border-zinc-700 hover:ring-2 hover:ring-indigo-500 transition-all"
+                                    @click="openLightbox(log.media!.filter(m => m.signed_url), idx)"
+                                >
+                                    <img :src="m.signed_url" class="h-full w-full object-cover" alt="Care log photo" />
+                                </button>
+                                <span v-if="log.media.length > 3" class="text-xs text-zinc-400">+{{ log.media.length - 3 }}</span>
+                            </template>
+                            <button
+                                type="button"
+                                class="h-8 w-8 rounded border border-dashed border-zinc-300 dark:border-zinc-600 flex items-center justify-center text-zinc-400 hover:text-indigo-500 hover:border-indigo-500 transition-colors"
+                                title="Upload photos"
+                                @click="openUpload(log.id)"
+                            >
+                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Inline upload form -->
+                        <div v-if="uploadLogId === log.id" class="mt-2 p-3 rounded-md border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 space-y-2">
+                            <input
+                                type="file"
+                                accept="image/jpeg,image/jpg,image/png,image/webp"
+                                multiple
+                                class="block w-full text-xs text-zinc-500 file:mr-2 file:rounded file:border-0 file:bg-indigo-50 file:px-2 file:py-1 file:text-xs file:font-medium file:text-indigo-700 dark:file:bg-indigo-900/30 dark:file:text-indigo-300"
+                                @change="onFilesSelected"
+                            />
+                            <div v-if="uploadPreviews.length > 0" class="flex gap-2 flex-wrap">
+                                <div v-for="(preview, idx) in uploadPreviews" :key="idx" class="relative h-14 w-14">
+                                    <img :src="preview" class="h-full w-full rounded object-cover" />
+                                    <button
+                                        type="button"
+                                        class="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white flex items-center justify-center text-[10px]"
+                                        @click="removeUploadFile(idx)"
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                            </div>
+                            <p v-if="uploadForm.errors.images" class="text-xs text-red-600">{{ uploadForm.errors.images }}</p>
+                            <div class="flex gap-2">
+                                <button
+                                    type="button"
+                                    class="rounded bg-indigo-600 px-2 py-1 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+                                    :disabled="uploadForm.processing || uploadForm.images.length === 0"
+                                    @click="submitUpload"
+                                >
+                                    Upload
+                                </button>
+                                <button type="button" class="text-xs text-zinc-400 hover:text-zinc-600" @click="cancelUpload">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </td>
                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
                         {{ formatDateTime(log.occurred_at) }}
                     </td>
                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
                         {{ log.logged_by_user?.name ?? '—' }}
                     </td>
-                    <td class="px-4 py-3 text-right">
+                    <td class="px-4 py-3 text-right space-x-3">
+                        <Link
+                            :href="tenantRoute('staff.care-logs.show', log.id)"
+                            class="text-xs font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+                        >
+                            View
+                        </Link>
                         <ConfirmModal
                             ref="deleteModal"
                             title="Delete Log Entry"
@@ -220,4 +347,12 @@ const ACTIVITY_COLORS: Record<string, string> = {
 
         <Pagination v-if="logs.last_page > 1" :paginator="logs" />
     </div>
+
+    <!-- Lightbox -->
+    <LightboxModal
+        v-if="lightboxOpen"
+        :images="lightboxImages"
+        :initial-index="lightboxIndex"
+        @close="lightboxOpen = false"
+    />
 </template>

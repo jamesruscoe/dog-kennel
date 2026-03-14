@@ -17,7 +17,7 @@ class CareLogService
     public function list(array $filters = [], ?Booking $booking = null): LengthAwarePaginator
     {
         return CareLog::query()
-            ->with(['booking.dog.owner.user', 'loggedByUser'])
+            ->with(['booking.dog.owner.user', 'loggedByUser', 'media'])
             ->when($booking, fn ($q) => $q->where('booking_id', $booking->id))
             ->when($filters['activity_type'] ?? null, fn ($q, $t) => $q->where('activity_type', $t))
             ->when($filters['date_from'] ?? null, fn ($q, $d) => $q->whereDate('occurred_at', '>=', $d))
