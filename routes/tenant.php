@@ -15,6 +15,7 @@ use App\Http\Controllers\Kennel\KennelSettingsController;
 use App\Http\Controllers\Kennel\NotificationController;
 use App\Http\Controllers\Kennel\OwnerController;
 use App\Http\Controllers\Owner\ConversationController as OwnerConversationController;
+use App\Http\Controllers\Owner\OwnerAccountController;
 use App\Http\Controllers\Owner\OwnerBookingController;
 use App\Http\Controllers\Owner\OwnerDashboardController;
 use App\Http\Controllers\Owner\OwnerDogController;
@@ -144,6 +145,7 @@ Route::middleware(['auth', 'verified', 'role.staff'])
             ->name('finance.')
             ->group(function () {
                 Route::get('/', [FinanceController::class, 'index'])->name('index');
+                Route::post('/connect-stripe', [FinanceController::class, 'connectStripe'])->name('connect-stripe');
             });
     });
 
@@ -185,6 +187,11 @@ Route::middleware(['auth', 'verified', 'role.owner'])
         Route::get('/dogs/{dog}', [OwnerDogController::class, 'show'])->name('dogs.show');
         Route::get('/dogs/{dog}/edit', [OwnerDogController::class, 'edit'])->name('dogs.edit');
         Route::patch('/dogs/{dog}', [OwnerDogController::class, 'update'])->name('dogs.update');
+
+        // Account
+        Route::get('/account', [OwnerAccountController::class, 'edit'])->name('account.edit');
+        Route::patch('/account/profile', [OwnerAccountController::class, 'updateProfile'])->name('account.update-profile');
+        Route::patch('/account/password', [OwnerAccountController::class, 'updatePassword'])->name('account.update-password');
     });
 
 // ─────────────────────────────────────────────────────────────────────────────

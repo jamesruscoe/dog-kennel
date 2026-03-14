@@ -36,7 +36,7 @@ class CapacityService
             $dates[$key] = Booking::query()
                 ->whereIn('status', [BookingStatus::Approved->value, BookingStatus::Pending->value])
                 ->where('check_in_date', '<=', $key)
-                ->where('check_out_date', '>', $key)
+                ->where('check_out_date', '>=', $key)
                 ->count();
         }
 
@@ -51,12 +51,15 @@ class CapacityService
         // TODO: JOB 6 — implement with exclude for update scenarios
         $max = $this->maxCapacity();
 
-        foreach (CarbonPeriod::create($checkIn, $checkOut->subDay()) as $date) {
+        // For same-day bookings, check just that single day
+        $lastNight = $checkIn->equalTo($checkOut) ? $checkOut : $checkOut->copy()->subDay();
+
+        foreach (CarbonPeriod::create($checkIn, $lastNight) as $date) {
             $key = $date->toDateString();
             $count = Booking::query()
                 ->whereIn('status', [BookingStatus::Approved->value, BookingStatus::Pending->value])
                 ->where('check_in_date', '<=', $key)
-                ->where('check_out_date', '>', $key)
+                ->where('check_out_date', '>=', $key)
                 ->when($excludeBookingId, fn($q) => $q->where('id', '!=', $excludeBookingId))
                 ->count();
 

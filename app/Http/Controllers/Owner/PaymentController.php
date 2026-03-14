@@ -44,4 +44,5 @@ class PaymentController extends Controller
             'amount_display' => $booking->amount_display,
         ]);
     }
+
 }

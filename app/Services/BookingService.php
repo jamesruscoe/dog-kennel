@@ -94,7 +94,7 @@ class BookingService
         $this->validateCapacity($checkIn, $checkOut);
 
         $settings    = KennelSettings::firstOrFail();
-        $nights      = $checkIn->diffInDays($checkOut);
+        $nights      = max(1, $checkIn->diffInDays($checkOut));
         $amountPence = $nights * $settings->nightly_rate_pence;
 
         return DB::transaction(function () use ($dog, $data, $checkIn, $checkOut, $amountPence, $company) {
@@ -182,8 +182,8 @@ class BookingService
 
     private function validateDates(Carbon $checkIn, Carbon $checkOut): void
     {
-        if ($checkOut->lte($checkIn)) {
-            throw new InvalidBookingDateException('Check-out must be after check-in.');
+        if ($checkOut->lt($checkIn)) {
+            throw new InvalidBookingDateException('Check-out cannot be before check-in.');
         }
 
         if ($checkIn->isPast() && !$checkIn->isToday()) {

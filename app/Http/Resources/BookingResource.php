@@ -17,7 +17,7 @@ class BookingResource extends JsonResource
             'dog'                  => new DogResource($this->whenLoaded('dog')),
             'check_in_date'        => $this->check_in_date?->toDateString(),
             'check_out_date'       => $this->check_out_date?->toDateString(),
-            'nights'               => $this->check_in_date?->diffInDays($this->check_out_date),
+            'nights'               => max(1, $this->check_in_date?->diffInDays($this->check_out_date) ?? 1),
             'status'               => $this->status instanceof \App\Enums\BookingStatus ? $this->status->value : $this->status,
             'status_label'         => $this->status_label,
             'notes'                => $this->notes,

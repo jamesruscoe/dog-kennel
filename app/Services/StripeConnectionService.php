@@ -24,6 +24,31 @@ class StripeConnectionService
     }
 
     /**
+     * Check the Stripe account status and update onboarding_complete if needed.
+     */
+    public function refreshOnboardingStatus(Company $company): void
+    {
+        if (! $this->isConnected($company) || $company->stripe_onboarding_complete) {
+            return;
+        }
+
+        if (empty(config('services.stripe.secret'))) {
+            return;
+        }
+
+        try {
+            $stripe  = new \Stripe\StripeClient(config('services.stripe.secret'));
+            $account = $stripe->accounts->retrieve($company->stripe_account_id);
+
+            if ($account->charges_enabled && $account->details_submitted) {
+                $company->update(['stripe_onboarding_complete' => true]);
+            }
+        } catch (\Throwable) {
+            // Silently fail — status will be checked again next time
+        }
+    }
+
+    /**
      * Generate a Stripe Connect onboarding URL for the given company.
      * Returns null if Stripe is not configured in the environment.
      */
@@ -37,14 +62,20 @@ class StripeConnectionService
             $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
 
             if (empty($company->stripe_account_id)) {
-                $account = $stripe->accounts->create(['type' => 'express']);
+                $account = $stripe->accounts->create([
+                    'type'         => 'express',
+                    'capabilities' => [
+                        'card_payments' => ['requested' => true],
+                        'transfers'     => ['requested' => true],
+                    ],
+                ]);
                 $company->update(['stripe_account_id' => $account->id]);
             }
 
             $link = $stripe->accountLinks->create([
                 'account'     => $company->stripe_account_id,
-                'refresh_url' => url("/{$company->slug}/staff/settings"),
-                'return_url'  => url("/{$company->slug}/staff/settings"),
+                'refresh_url' => url("/{$company->slug}/staff/finance"),
+                'return_url'  => url("/{$company->slug}/staff/finance"),
                 'type'        => 'account_onboarding',
             ]);
 

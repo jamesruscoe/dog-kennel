@@ -26,7 +26,8 @@ const form = useForm({
 const nights = computed(() => {
     if (!form.check_in_date || !form.check_out_date) return 0;
     const ms = new Date(form.check_out_date).getTime() - new Date(form.check_in_date).getTime();
-    return Math.max(0, Math.round(ms / 86_400_000));
+    const diff = Math.round(ms / 86_400_000);
+    return diff >= 0 ? Math.max(1, diff) : 0;
 });
 
 const estimatedTotal = computed(() => {
@@ -43,9 +44,7 @@ const minCheckIn = computed(() => {
 
 const minCheckOut = computed(() => {
     if (!form.check_in_date) return minCheckIn.value;
-    const d = new Date(form.check_in_date);
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().substring(0, 10);
+    return form.check_in_date;
 });
 
 const DAY_NAMES = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

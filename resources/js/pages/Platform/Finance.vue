@@ -2,26 +2,31 @@
 import { Head, Link } from '@inertiajs/vue3';
 
 defineProps<{
-    metrics: {
-        total_companies: number;
-        total_users: number;
-        total_bookings: number;
-        active_bookings: number;
+    stats: {
+        total_processed_pence: number;
+        total_processed_display: string;
+        total_payments: number;
+        total_fees_pence: number;
+        total_fees_display: string;
+        connected_accounts: number;
     };
     companies: Array<{
         id: number;
         name: string;
         slug: string;
-        stripe_onboarding_complete: boolean;
-        users_count: number;
-        bookings_count: number;
-        created_at: string;
+        stripe_account_id: string;
+        application_fee_percent: number;
+        total_revenue_pence: number;
+        total_revenue_display: string;
+        fees_earned_pence: number;
+        fees_earned_display: string;
+        payment_count: number;
     }>;
 }>();
 </script>
 
 <template>
-    <Head title="Platform Dashboard — Dog Desk" />
+    <Head title="Platform Finance — Dog Desk" />
 
     <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950">
         <!-- Top bar -->
@@ -35,10 +40,10 @@ defineProps<{
             </div>
             <div class="flex items-center gap-4">
                 <Link
-                    :href="route('platform.finance')"
+                    :href="route('platform.dashboard')"
                     class="text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors"
                 >
-                    Finance
+                    Dashboard
                 </Link>
                 <Link
                     :href="route('logout')"
@@ -53,46 +58,53 @@ defineProps<{
 
         <main class="max-w-6xl mx-auto px-6 py-8">
             <div class="mb-8">
-                <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Platform Overview</h1>
-                <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">All companies and usage across Dog Desk</p>
+                <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Platform Finance</h1>
+                <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Platform fees and revenue across all connected kennels</p>
             </div>
 
-            <!-- Metrics -->
+            <!-- Stats -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
                 <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
-                    <p class="text-xs font-medium uppercase tracking-wide text-zinc-400">Companies</p>
-                    <p class="mt-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ metrics.total_companies }}</p>
+                    <p class="text-xs font-medium uppercase tracking-wide text-zinc-400">Platform Fees Earned</p>
+                    <p class="mt-1 text-3xl font-bold text-emerald-600 dark:text-emerald-400">{{ stats.total_fees_display }}</p>
+                    <p class="text-xs text-zinc-400">Your 2% cut</p>
                 </div>
                 <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
-                    <p class="text-xs font-medium uppercase tracking-wide text-zinc-400">Users</p>
-                    <p class="mt-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ metrics.total_users }}</p>
+                    <p class="text-xs font-medium uppercase tracking-wide text-zinc-400">Total Processed</p>
+                    <p class="mt-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ stats.total_processed_display }}</p>
+                    <p class="text-xs text-zinc-400">Gross volume</p>
                 </div>
                 <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
-                    <p class="text-xs font-medium uppercase tracking-wide text-zinc-400">Total Bookings</p>
-                    <p class="mt-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ metrics.total_bookings }}</p>
+                    <p class="text-xs font-medium uppercase tracking-wide text-zinc-400">Payments</p>
+                    <p class="mt-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ stats.total_payments }}</p>
+                    <p class="text-xs text-zinc-400">Succeeded</p>
                 </div>
                 <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
-                    <p class="text-xs font-medium uppercase tracking-wide text-zinc-400">Active Bookings</p>
-                    <p class="mt-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ metrics.active_bookings }}</p>
+                    <p class="text-xs font-medium uppercase tracking-wide text-zinc-400">Connected Accounts</p>
+                    <p class="mt-1 text-3xl font-bold text-zinc-900 dark:text-zinc-100">{{ stats.connected_accounts }}</p>
+                    <p class="text-xs text-zinc-400">Stripe Connect</p>
                 </div>
             </div>
 
-            <!-- Companies table -->
+            <!-- Per-company breakdown -->
             <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
                 <div class="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
-                    <h2 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Companies</h2>
+                    <h2 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Revenue by Company</h2>
                 </div>
+
                 <div v-if="companies.length === 0" class="px-6 py-12 text-center text-sm text-zinc-400">
-                    No companies yet.
+                    No connected accounts yet.
                 </div>
+
                 <table v-else class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-zinc-200 dark:border-zinc-800">
                             <th class="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wide">Company</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wide">Stripe</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-zinc-400 uppercase tracking-wide">Users</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-zinc-400 uppercase tracking-wide">Bookings</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-zinc-400 uppercase tracking-wide">Portal</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-zinc-400 uppercase tracking-wide">Stripe Account</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-zinc-400 uppercase tracking-wide">Fee %</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-zinc-400 uppercase tracking-wide">Payments</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-zinc-400 uppercase tracking-wide">Gross Revenue</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-zinc-400 uppercase tracking-wide">Platform Fees</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
@@ -102,27 +114,12 @@ defineProps<{
                                 <p class="text-xs text-zinc-400">/{{ company.slug }}</p>
                             </td>
                             <td class="px-6 py-4">
-                                <span
-                                    :class="[
-                                        'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
-                                        company.stripe_onboarding_complete
-                                            ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
-                                            : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
-                                    ]"
-                                >
-                                    {{ company.stripe_onboarding_complete ? 'Connected' : 'Not configured' }}
-                                </span>
+                                <code class="text-xs text-zinc-500 dark:text-zinc-400">{{ company.stripe_account_id }}</code>
                             </td>
-                            <td class="px-6 py-4 text-right text-zinc-600 dark:text-zinc-400">{{ company.users_count }}</td>
-                            <td class="px-6 py-4 text-right text-zinc-600 dark:text-zinc-400">{{ company.bookings_count }}</td>
-                            <td class="px-6 py-4 text-right">
-                                <a
-                                    :href="`/${company.slug}/staff/dashboard`"
-                                    class="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-xs font-medium transition-colors"
-                                >
-                                    Open portal →
-                                </a>
-                            </td>
+                            <td class="px-6 py-4 text-right text-zinc-600 dark:text-zinc-400">{{ company.application_fee_percent }}%</td>
+                            <td class="px-6 py-4 text-right text-zinc-600 dark:text-zinc-400">{{ company.payment_count }}</td>
+                            <td class="px-6 py-4 text-right font-medium text-zinc-900 dark:text-zinc-100">{{ company.total_revenue_display }}</td>
+                            <td class="px-6 py-4 text-right font-medium text-emerald-600 dark:text-emerald-400">{{ company.fees_earned_display }}</td>
                         </tr>
                     </tbody>
                 </table>
