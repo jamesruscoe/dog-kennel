@@ -244,13 +244,13 @@ function cancelUpload() {
                     </td>
                     <td class="px-4 py-3">
                         <div class="flex items-center gap-1">
-                            <template v-if="log.media && log.media.length > 0">
+                            <template v-if="log.media && log.media.filter(m => m.signed_url).length > 0">
                                 <button
-                                    v-for="(m, idx) in log.media.slice(0, 3)"
+                                    v-for="(m, idx) in log.media.filter(m => m.signed_url).slice(0, 3)"
                                     :key="m.id"
                                     type="button"
                                     class="h-8 w-8 rounded overflow-hidden border border-zinc-200 dark:border-zinc-700 hover:ring-2 hover:ring-indigo-500 transition-all"
-                                    @click="openLightbox(log.media!, idx)"
+                                    @click="openLightbox(log.media!.filter(m => m.signed_url), idx)"
                                 >
                                     <img :src="m.signed_url" class="h-full w-full object-cover" alt="Care log photo" />
                                 </button>
@@ -311,7 +311,13 @@ function cancelUpload() {
                     <td class="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
                         {{ log.logged_by_user?.name ?? '—' }}
                     </td>
-                    <td class="px-4 py-3 text-right">
+                    <td class="px-4 py-3 text-right space-x-3">
+                        <Link
+                            :href="tenantRoute('staff.care-logs.show', log.id)"
+                            class="text-xs font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+                        >
+                            View
+                        </Link>
                         <ConfirmModal
                             ref="deleteModal"
                             title="Delete Log Entry"

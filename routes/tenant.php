@@ -108,6 +108,9 @@ Route::middleware(['auth', 'verified', 'role.staff'])
         Route::get('/care-logs', [CareLogController::class, 'index'])->name('care-logs.index');
         Route::get('/bookings/{booking}/care-logs/create', [CareLogController::class, 'create'])->name('care-logs.create');
         Route::post('/bookings/{booking}/care-logs', [CareLogController::class, 'store'])->name('care-logs.store');
+        Route::get('/care-logs/{careLog}', [CareLogController::class, 'show'])->name('care-logs.show');
+        Route::get('/care-logs/{careLog}/edit', [CareLogController::class, 'edit'])->name('care-logs.edit');
+        Route::patch('/care-logs/{careLog}', [CareLogController::class, 'update'])->name('care-logs.update');
         Route::delete('/care-logs/{careLog}', [CareLogController::class, 'destroy'])->name('care-logs.destroy');
 
         // Care Log Media
@@ -167,6 +170,7 @@ Route::middleware(['auth', 'verified', 'role.owner'])
 
         // Updates
         Route::get('/updates', [UpdateController::class, 'index'])->name('updates.index');
+        Route::get('/updates/{careLog}', [UpdateController::class, 'show'])->name('updates.show');
 
         // Messages
         Route::get('/messages', [OwnerConversationController::class, 'index'])->name('messages.index');

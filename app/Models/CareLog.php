@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class CareLog extends Model
+class CareLog extends Model implements HasMedia
 {
     /** @use HasFactory<CareLogFactory> */
-    use HasFactory, BelongsToCompany;
+    use HasFactory, BelongsToCompany, InteractsWithMedia;
 
     /**
      * @var list<string>
@@ -51,9 +52,15 @@ class CareLog extends Model
         return $this->belongsTo(User::class, 'logged_by');
     }
 
-    public function media(): HasMany
+    // -------------------------------------------------------------------------
+    // Media Collections (Spatie)
+    // -------------------------------------------------------------------------
+
+    public function registerMediaCollections(): void
     {
-        return $this->hasMany(CareLogMedia::class)->orderBy('order');
+        $this->addMediaCollection('care-log-photos')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp'])
+            ->useDisk(config('media-library.disk_name'));
     }
 
     // -------------------------------------------------------------------------

@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Staff;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Staff\StoreCareLogMediaRequest;
 use App\Models\CareLog;
-use App\Models\CareLogMedia;
 use App\Models\CompanyContext;
 use App\Services\CareLogMediaService;
 use Illuminate\Http\RedirectResponse;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class CareLogMediaController extends Controller
 {
@@ -27,11 +27,12 @@ class CareLogMediaController extends Controller
         return back()->with('success', 'Photos uploaded.');
     }
 
-    public function destroy(CareLogMedia $media): RedirectResponse
+    public function destroy(Media $media): RedirectResponse
     {
         $company = app(CompanyContext::class);
 
-        if ($media->company_id !== $company->id) {
+        $careLog = CareLog::findOrFail($media->model_id);
+        if ($careLog->company_id !== $company->id) {
             abort(403);
         }
 

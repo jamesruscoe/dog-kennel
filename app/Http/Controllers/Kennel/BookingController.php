@@ -37,7 +37,7 @@ class BookingController extends Controller
 
     public function show(Booking $booking): Response
     {
-        $booking->load(['dog.owner.user', 'careLogs.loggedByUser', 'payment']);
+        $booking->load(['dog.owner.user', 'careLogs.loggedByUser', 'careLogs.media', 'payment']);
 
         return Inertia::render('Staff/Bookings/Show', [
             'booking' => new BookingResource($booking),

@@ -84,10 +84,11 @@ interface GalleryGroup {
 function getGalleryGroups(): GalleryGroup[] {
     const groups: Map<string, CareLogMedia[]> = new Map();
     for (const log of props.logs.data) {
-        if (!log.media?.length) continue;
+        const validMedia = log.media?.filter(m => m.signed_url) ?? [];
+        if (!validMedia.length) continue;
         const dateKey = log.occurred_at.split(' ')[0] ?? log.occurred_at.split('T')[0];
         const existing = groups.get(dateKey) ?? [];
-        existing.push(...log.media);
+        existing.push(...validMedia);
         groups.set(dateKey, existing);
     }
     return Array.from(groups.entries()).map(([date, media]) => ({
@@ -190,17 +191,24 @@ function openGalleryLightbox(groups: GalleryGroup[], groupIdx: number, mediaIdx:
                 <p v-if="log.notes" class="text-sm text-zinc-600 dark:text-zinc-400 mb-3">{{ log.notes }}</p>
 
                 <!-- Image grid -->
-                <div v-if="log.media && log.media.length > 0" class="flex flex-wrap gap-2">
+                <div v-if="log.media && log.media.filter(m => m.signed_url).length > 0" class="flex flex-wrap gap-2 mb-3">
                     <button
-                        v-for="(m, idx) in log.media"
+                        v-for="(m, idx) in log.media.filter(m => m.signed_url)"
                         :key="m.id"
                         type="button"
                         class="h-20 w-20 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700 hover:ring-2 hover:ring-indigo-500 transition-all"
-                        @click="openLightbox(log.media!, idx)"
+                        @click="openLightbox(log.media!.filter(m => m.signed_url), idx)"
                     >
                         <img :src="m.signed_url" class="h-full w-full object-cover" alt="Care log photo" />
                     </button>
                 </div>
+
+                <Link
+                    :href="tenantRoute('owner.updates.show', log.id)"
+                    class="inline-flex items-center text-xs font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+                >
+                    View details &rarr;
+                </Link>
             </div>
         </div>
 

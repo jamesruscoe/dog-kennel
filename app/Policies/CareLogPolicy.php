@@ -14,7 +14,18 @@ class CareLogPolicy
 
     public function view(User $user, CareLog $careLog): bool
     {
-        return $user->isStaffOrAdmin();
+        if ($user->isStaffOrAdmin()) {
+            return true;
+        }
+
+        if ($user->owner) {
+            $careLog->loadMissing('booking');
+
+            return $careLog->booking
+                && $user->owner->dogs()->where('dogs.id', $careLog->booking->dog_id)->exists();
+        }
+
+        return false;
     }
 
     public function create(User $user): bool

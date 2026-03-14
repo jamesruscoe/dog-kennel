@@ -124,10 +124,13 @@ export interface Booking {
 
 export interface CareLogMedia {
     id: number;
-    signed_url: string;
+    uuid: string;
+    name: string;
+    file_name: string;
     mime_type: string | null;
-    size_bytes: number | null;
-    order: number;
+    size: number;
+    order: number | null;
+    signed_url: string | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

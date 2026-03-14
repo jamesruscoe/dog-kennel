@@ -159,9 +159,9 @@ function truncate(text: string, max: number) {
                     <li v-for="log in recentUpdates" :key="log.id" class="px-6 py-4">
                         <div class="flex items-start gap-3">
                             <!-- Thumbnail -->
-                            <div v-if="log.media && log.media.length > 0" class="shrink-0">
+                            <div v-if="log.media && log.media.some(m => m.signed_url)" class="shrink-0">
                                 <img
-                                    :src="log.media[0].signed_url"
+                                    :src="log.media.find(m => m.signed_url)!.signed_url"
                                     class="h-12 w-12 rounded-lg object-cover border border-zinc-200 dark:border-zinc-700"
                                     alt="Care log photo"
                                 />
@@ -186,7 +186,7 @@ function truncate(text: string, max: number) {
                         </div>
                         <div class="mt-2">
                             <Link
-                                :href="tenantRoute('owner.updates.index') + '?type=' + log.activity_type"
+                                :href="tenantRoute('owner.updates.show', log.id)"
                                 class="inline-flex items-center rounded-md bg-indigo-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-indigo-700 transition-colors"
                             >
                                 View Entire Update

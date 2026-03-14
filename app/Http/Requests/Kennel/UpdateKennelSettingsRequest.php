@@ -10,7 +10,7 @@ class UpdateKennelSettingsRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isStaff() ?? false;
+        return $this->user()?->isStaffOrAdmin() ?? false;
     }
 
     /**

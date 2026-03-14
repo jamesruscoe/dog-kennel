@@ -24,7 +24,26 @@ class CareLogResource extends JsonResource
             'activity_type'  => $this->activity_type,
             'activity_label' => $this->activity_label,
             'notes'          => $this->notes,
-            'media'          => CareLogMediaResource::collection($this->whenLoaded('media')),
+            'media'          => $this->whenLoaded('media', function () {
+                return $this->getMedia('care-log-photos')->map(function ($media) {
+                    try {
+                        $url = $media->getTemporaryUrl(now()->addMinutes(60));
+                    } catch (\Exception) {
+                        $url = $media->getUrl();
+                    }
+
+                    return [
+                        'id'         => $media->id,
+                        'uuid'       => $media->uuid,
+                        'name'       => $media->name,
+                        'file_name'  => $media->file_name,
+                        'mime_type'  => $media->mime_type,
+                        'size'       => $media->size,
+                        'order'      => $media->order_column,
+                        'signed_url' => $url,
+                    ];
+                });
+            }),
             'occurred_at'   => $this->occurred_at?->toDateTimeString(),
             'created_at'    => $this->created_at?->toDateTimeString(),
         ];

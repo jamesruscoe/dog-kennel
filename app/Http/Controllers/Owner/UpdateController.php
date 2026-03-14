@@ -6,11 +6,23 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CareLogResource;
 use App\Models\CareLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class UpdateController extends Controller
 {
+    public function show(Request $request, CareLog $careLog): Response
+    {
+        Gate::authorize('view', $careLog);
+
+        $careLog->load(['booking.dog.owner.user', 'loggedByUser', 'media']);
+
+        return Inertia::render('Staff/CareLogs/Show', [
+            'careLog' => new CareLogResource($careLog),
+        ]);
+    }
+
     public function index(Request $request): Response
     {
         $owner = $request->user()->owner;

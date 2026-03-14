@@ -3,14 +3,15 @@
 namespace App\Services;
 
 use App\Models\CareLog;
-use App\Models\CareLogMedia;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class CareLogMediaService
 {
+    private const COLLECTION = 'care-log-photos';
+    private const MAX_PHOTOS = 5;
+
     /**
      * Attach uploaded images to a care log entry.
      *
@@ -19,40 +20,23 @@ class CareLogMediaService
      */
     public function attach(CareLog $careLog, array $files): void
     {
-        $existingCount = $careLog->media()->count();
+        $existingCount = $careLog->getMedia(self::COLLECTION)->count();
         $newCount = count($files);
 
-        if ($existingCount + $newCount > 5) {
+        if ($existingCount + $newCount > self::MAX_PHOTOS) {
             throw ValidationException::withMessages([
-                'images' => "Maximum 5 photos allowed. This care log already has {$existingCount}.",
+                'images' => "Maximum " . self::MAX_PHOTOS . " photos allowed. This care log already has {$existingCount}.",
             ]);
         }
 
-        $companyId = $careLog->company_id;
-        $order = $existingCount;
-
         foreach ($files as $file) {
-            $uuid = Str::uuid();
-            $ext = $file->getClientOriginalExtension();
-            $path = "media/company-{$companyId}/care-logs/{$uuid}.{$ext}";
-
-            Storage::disk('s3')->put($path, file_get_contents($file->getRealPath()));
-
-            CareLogMedia::create([
-                'company_id'  => $companyId,
-                'care_log_id' => $careLog->id,
-                'path'        => $path,
-                'disk'        => 's3',
-                'mime_type'   => $file->getMimeType(),
-                'size_bytes'  => $file->getSize(),
-                'order'       => $order++,
-            ]);
+            $careLog->addMedia($file)
+                ->toMediaCollection(self::COLLECTION);
         }
     }
 
-    public function delete(CareLogMedia $media): void
+    public function delete(Media $media): void
     {
-        Storage::disk($media->disk ?? 's3')->delete($media->path);
         $media->delete();
     }
 }
