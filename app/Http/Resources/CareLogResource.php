@@ -24,6 +24,7 @@ class CareLogResource extends JsonResource
             'activity_type'  => $this->activity_type,
             'activity_label' => $this->activity_label,
             'notes'          => $this->notes,
+            'media'          => CareLogMediaResource::collection($this->whenLoaded('media')),
             'occurred_at'   => $this->occurred_at?->toDateTimeString(),
             'created_at'    => $this->created_at?->toDateTimeString(),
         ];

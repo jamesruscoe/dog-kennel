@@ -14,10 +14,14 @@ use App\Http\Controllers\Kennel\DogController;
 use App\Http\Controllers\Kennel\KennelSettingsController;
 use App\Http\Controllers\Kennel\NotificationController;
 use App\Http\Controllers\Kennel\OwnerController;
+use App\Http\Controllers\Owner\ConversationController as OwnerConversationController;
 use App\Http\Controllers\Owner\OwnerBookingController;
 use App\Http\Controllers\Owner\OwnerDashboardController;
 use App\Http\Controllers\Owner\OwnerDogController;
 use App\Http\Controllers\Owner\PaymentController;
+use App\Http\Controllers\Owner\UpdateController;
+use App\Http\Controllers\Staff\CareLogMediaController;
+use App\Http\Controllers\Staff\ConversationController as StaffConversationController;
 use App\Http\Controllers\Staff\StaffDashboardController;
 use App\Http\Controllers\Staff\StaffUserController;
 use App\Http\Controllers\Tenant\TenantWelcomeController;
@@ -106,6 +110,17 @@ Route::middleware(['auth', 'verified', 'role.staff'])
         Route::post('/bookings/{booking}/care-logs', [CareLogController::class, 'store'])->name('care-logs.store');
         Route::delete('/care-logs/{careLog}', [CareLogController::class, 'destroy'])->name('care-logs.destroy');
 
+        // Care Log Media
+        Route::post('/care-logs/{careLog}/media', [CareLogMediaController::class, 'store'])->name('care-logs.media.store');
+        Route::delete('/care-logs/media/{media}', [CareLogMediaController::class, 'destroy'])->name('care-logs.media.destroy');
+
+        // Messages
+        Route::get('/messages', [StaffConversationController::class, 'index'])->name('messages.index');
+        Route::get('/messages/{conversation}', [StaffConversationController::class, 'show'])->name('messages.show');
+        Route::post('/messages', [StaffConversationController::class, 'store'])->name('messages.store');
+        Route::post('/messages/{conversation}/reply', [StaffConversationController::class, 'reply'])->name('messages.reply');
+        Route::post('/messages/{conversation}/read', [StaffConversationController::class, 'markRead'])->name('messages.read');
+
         // Calendar
         Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
         Route::get('/calendar/occupancy', [CalendarController::class, 'occupancy'])->name('calendar.occupancy');
@@ -149,6 +164,15 @@ Route::middleware(['auth', 'verified', 'role.owner'])
 
         // Payment
         Route::post('/bookings/{booking}/payment/intent', [PaymentController::class, 'createIntent'])->name('bookings.payment.intent');
+
+        // Updates
+        Route::get('/updates', [UpdateController::class, 'index'])->name('updates.index');
+
+        // Messages
+        Route::get('/messages', [OwnerConversationController::class, 'index'])->name('messages.index');
+        Route::get('/messages/{conversation}', [OwnerConversationController::class, 'show'])->name('messages.show');
+        Route::post('/messages/{conversation}/reply', [OwnerConversationController::class, 'reply'])->name('messages.reply');
+        Route::post('/messages/{conversation}/read', [OwnerConversationController::class, 'markRead'])->name('messages.read');
 
         // Dogs
         Route::get('/dogs', [OwnerDogController::class, 'index'])->name('dogs.index');

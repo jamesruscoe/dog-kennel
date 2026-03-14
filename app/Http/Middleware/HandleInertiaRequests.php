@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Conversation;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -20,6 +21,17 @@ class HandleInertiaRequests extends Middleware
      *
      * @return array<string, mixed>
      */
+    private function unreadMessagesCount(mixed $user): int
+    {
+        $field = $user->isOwner() ? 'owner_user_id' : 'staff_user_id';
+
+        return \App\Models\Message::query()
+            ->whereIn('conversation_id', Conversation::where($field, $user->id)->select('id'))
+            ->where('sender_id', '!=', $user->id)
+            ->whereNull('read_at')
+            ->count();
+    }
+
     public function share(Request $request): array
     {
         $user = $request->user();
@@ -44,6 +56,9 @@ class HandleInertiaRequests extends Middleware
             ],
             'unread_notifications_count' => $user
                 ? $user->unreadNotifications()->count()
+                : 0,
+            'unread_messages_count' => $user
+                ? $this->unreadMessagesCount($user)
                 : 0,
             'csrf_token' => csrf_token(),
         ];

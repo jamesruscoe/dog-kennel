@@ -18,6 +18,7 @@ const stripeWarning = computed(() => company.value && !company.value.stripe_read
 
 const notificationStore = useNotificationStore();
 const unreadCount = computed(() => page.props.unread_notifications_count ?? 0);
+const unreadMessages = computed(() => page.props.unread_messages_count ?? 0);
 
 const tenantRoute = useTenantRoute();
 
@@ -40,6 +41,7 @@ const staffNavBase = [
     { label: 'Dogs',        href: () => tenantRoute('staff.dogs.index'),     icon: 'dog' },
     { label: 'Bookings',    href: () => tenantRoute('staff.bookings.index'), icon: 'calendar-days' },
     { label: 'Care Logs',   href: () => tenantRoute('staff.care-logs.index'), icon: 'clipboard-list' },
+    { label: 'Messages',    href: () => tenantRoute('staff.messages.index'), icon: 'chat', badge: () => unreadMessages.value },
     { label: 'Calendar',    href: () => tenantRoute('staff.calendar.index'), icon: 'calendar' },
     { label: 'Settings',    href: () => tenantRoute('staff.settings.edit'),  icon: 'cog' },
     { label: 'Staff Users', href: () => tenantRoute('staff.users.index'),    icon: 'user-shield' },
@@ -52,6 +54,8 @@ const adminNavExtra = [
 const ownerNav = [
     { label: 'Dashboard', href: () => tenantRoute('owner.dashboard'),      icon: 'home' },
     { label: 'Bookings',  href: () => tenantRoute('owner.bookings.index'), icon: 'calendar-days' },
+    { label: 'Updates',  href: () => tenantRoute('owner.updates.index'),  icon: 'clipboard-list' },
+    { label: 'Messages', href: () => tenantRoute('owner.messages.index'), icon: 'chat', badge: () => unreadMessages.value },
     { label: 'My Dogs',   href: () => tenantRoute('owner.dogs.index'),     icon: 'dog' },
 ];
 
@@ -163,10 +167,20 @@ function logout() {
                             <svg v-else-if="item.icon === 'banknotes'" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
                             </svg>
+                            <!-- Chat icon (Messages) -->
+                            <svg v-else-if="item.icon === 'chat'" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
                             <!-- Fallback dot -->
                             <span v-else class="h-1.5 w-1.5 rounded-full bg-current" />
 
                             {{ item.label }}
+                            <span
+                                v-if="item.badge && item.badge() > 0"
+                                class="ml-auto inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white"
+                            >
+                                {{ item.badge() > 9 ? '9+' : item.badge() }}
+                            </span>
                         </Link>
                     </li>
                 </ul>
