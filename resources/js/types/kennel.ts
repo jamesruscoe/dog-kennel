@@ -38,11 +38,14 @@ export interface AuthUser {
 // Company
 // ─────────────────────────────────────────────────────────────────────────────
 
+export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'trialing' | 'incomplete' | 'unpaid';
+
 export interface Company {
     id: number;
     name: string;
     slug: string;
     stripe_ready: boolean;
+    subscription_status: SubscriptionStatus | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

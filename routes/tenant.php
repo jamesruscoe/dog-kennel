@@ -144,6 +144,12 @@ Route::middleware(['auth', 'verified', 'role.staff'])
             ->name('finance.')
             ->group(function () {
                 Route::get('/', [FinanceController::class, 'index'])->name('index');
+<<<<<<< Updated upstream
+=======
+                Route::post('/connect-stripe', [FinanceController::class, 'connectStripe'])->name('connect-stripe');
+                Route::post('/subscribe', [FinanceController::class, 'subscribe'])->name('subscribe');
+                Route::post('/manage-billing', [FinanceController::class, 'manageBilling'])->name('manage-billing');
+>>>>>>> Stashed changes
             });
     });
 

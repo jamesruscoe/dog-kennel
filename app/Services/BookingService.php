@@ -86,6 +86,12 @@ class BookingService
             );
         }
 
+        if (! $company->isSubscriptionActive()) {
+            throw new StripeNotConfiguredException(
+                'This kennel\'s subscription is not active. Please contact the kennel.'
+            );
+        }
+
         $checkIn  = Carbon::parse($data['check_in_date']);
         $checkOut = Carbon::parse($data['check_out_date']);
 

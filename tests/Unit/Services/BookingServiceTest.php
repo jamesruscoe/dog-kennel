@@ -77,6 +77,7 @@ class BookingServiceTest extends TestCase
         $this->company->update([
             'stripe_account_id'          => 'acct_test123',
             'stripe_onboarding_complete' => true,
+            'subscription_status'        => 'active',
         ]);
 
         $booking = $this->service->create($this->dog, [
@@ -93,6 +94,7 @@ class BookingServiceTest extends TestCase
         $this->company->update([
             'stripe_account_id'          => 'acct_test123',
             'stripe_onboarding_complete' => true,
+            'subscription_status'        => 'active',
         ]);
 
         $checkIn  = Carbon::tomorrow()->toDateString();

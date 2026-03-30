@@ -44,9 +44,10 @@ return [
     ],
 
     'stripe' => [
-        'public'         => env('STRIPE_PUBLIC_KEY'),
-        'secret'         => env('STRIPE_SECRET_KEY'),
-        'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+        'public'                => env('STRIPE_PUBLIC_KEY'),
+        'secret'                => env('STRIPE_SECRET_KEY'),
+        'webhook_secret'        => env('STRIPE_WEBHOOK_SECRET'),
+        'subscription_price_id' => env('STRIPE_SUBSCRIPTION_PRICE_ID'),
     ],
 
 ];

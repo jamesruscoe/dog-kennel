@@ -39,7 +39,21 @@ class PaymentService
             'currency'                  => 'gbp',
             'metadata'                  => ['booking_id' => $booking->id],
             'automatic_payment_methods' => ['enabled' => true],
+<<<<<<< Updated upstream
         ]);
+=======
+        ];
+
+        // Use Stripe Connect if the company has a connected account
+        // Funds go directly to the company — platform revenue comes from subscriptions
+        if ($company?->stripe_account_id) {
+            $params['transfer_data'] = [
+                'destination' => $company->stripe_account_id,
+            ];
+        }
+
+        $intent = PaymentIntent::create($params);
+>>>>>>> Stashed changes
 
         return $intent->client_secret;
     }

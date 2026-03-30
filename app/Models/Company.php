@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\SubscriptionStatus;
 use Database\Factories\CompanyFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,14 +20,18 @@ class Company extends Model
         'slug',
         'stripe_account_id',
         'stripe_onboarding_complete',
-        'application_fee_percent',
+        'stripe_customer_id',
+        'stripe_subscription_id',
+        'subscription_status',
+        'subscription_ends_at',
     ];
 
     protected function casts(): array
     {
         return [
             'stripe_onboarding_complete' => 'boolean',
-            'application_fee_percent'    => 'decimal:2',
+            'subscription_status'        => SubscriptionStatus::class,
+            'subscription_ends_at'       => 'datetime',
         ];
     }
 
@@ -75,5 +80,14 @@ class Company extends Model
     public function isStripeReady(): bool
     {
         return $this->isStripeConnected() && $this->stripe_onboarding_complete;
+    }
+
+    // -------------------------------------------------------------------------
+    // Subscription helpers
+    // -------------------------------------------------------------------------
+
+    public function isSubscriptionActive(): bool
+    {
+        return $this->subscription_status?->isUsable() ?? false;
     }
 }

@@ -15,7 +15,6 @@ class CompanySeeder extends Seeder
                 'name'                       => 'PawStay Demo',
                 'stripe_account_id'          => null,
                 'stripe_onboarding_complete' => false,
-                'application_fee_percent'    => 2.00,
             ]
         );
     }

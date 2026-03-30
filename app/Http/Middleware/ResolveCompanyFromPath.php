@@ -36,10 +36,11 @@ class ResolveCompanyFromPath
 
         // Share with all Inertia pages
         Inertia::share('company', [
-            'id'           => $company->id,
-            'name'         => $company->name,
-            'slug'         => $company->slug,
-            'stripe_ready' => $company->isStripeReady(),
+            'id'                  => $company->id,
+            'name'                => $company->name,
+            'slug'                => $company->slug,
+            'stripe_ready'        => $company->isStripeReady(),
+            'subscription_active' => $company->isSubscriptionActive(),
         ]);
 
         return $next($request);

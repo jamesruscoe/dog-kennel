@@ -5,11 +5,25 @@ namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Payment;
+<<<<<<< Updated upstream
+=======
+use App\Services\StripeConnectionService;
+use App\Services\SubscriptionService;
+use Illuminate\Http\JsonResponse;
+>>>>>>> Stashed changes
 use Inertia\Inertia;
 use Inertia\Response;
 
 class FinanceController extends Controller
 {
+<<<<<<< Updated upstream
+=======
+    public function __construct(
+        private readonly StripeConnectionService $stripeService,
+        private readonly SubscriptionService $subscriptionService,
+    ) {}
+
+>>>>>>> Stashed changes
     public function index(): Response
     {
         $totalRevenuePence = Payment::where('status', 'succeeded')->sum('amount_pence');
@@ -48,6 +62,70 @@ class FinanceController extends Controller
                 'paid_bookings'         => $paidBookings,
             ],
             'recentPayments' => $recentPayments,
+<<<<<<< Updated upstream
         ]);
     }
+=======
+            'stripe' => [
+                'connected'           => $this->stripeService->isConnected($company),
+                'ready'               => $this->stripeService->isReady($company),
+                'account_id'          => $company->stripe_account_id,
+                'onboarding_complete' => $company->stripe_onboarding_complete,
+            ],
+            'subscription' => [
+                'status'           => $company->subscription_status?->value,
+                'status_label'     => $company->subscription_status?->label(),
+                'is_active'        => $company->isSubscriptionActive(),
+                'ends_at'          => $company->subscription_ends_at?->toIso8601String(),
+                'has_subscription' => ! empty($company->stripe_subscription_id),
+            ],
+        ]);
+    }
+
+    public function connectStripe(): JsonResponse
+    {
+        $company = app(CompanyContext::class);
+        $url = $this->stripeService->getOnboardingUrl($company);
+
+        if (! $url) {
+            return response()->json([
+                'error' => 'Stripe is not configured. Please add your Stripe API keys to the environment.',
+            ], 422);
+        }
+
+        return response()->json(['url' => $url]);
+    }
+
+    public function subscribe(): JsonResponse
+    {
+        $company    = app(CompanyContext::class);
+        $financeUrl = url("/{$company->slug}/staff/finance");
+
+        $url = $this->subscriptionService->createCheckoutSession($company, $financeUrl, $financeUrl);
+
+        if (! $url) {
+            return response()->json([
+                'error' => 'Stripe subscription is not configured. Please set STRIPE_SUBSCRIPTION_PRICE_ID in the environment.',
+            ], 422);
+        }
+
+        return response()->json(['url' => $url]);
+    }
+
+    public function manageBilling(): JsonResponse
+    {
+        $company    = app(CompanyContext::class);
+        $financeUrl = url("/{$company->slug}/staff/finance");
+
+        $url = $this->subscriptionService->getManageUrl($company, $financeUrl);
+
+        if (! $url) {
+            return response()->json([
+                'error' => 'Unable to create billing portal session.',
+            ], 422);
+        }
+
+        return response()->json(['url' => $url]);
+    }
+>>>>>>> Stashed changes
 }
